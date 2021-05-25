@@ -19,21 +19,3 @@ msgstr "Plugin for subscribe to journal notification without user  registration.
 
 msgid "plugins.generic.easySubscribe.page.title"
 msgstr "Subscribe"
-
-msgid "plugins.generic.easySubscribe.page.subscribe"
-msgstr "Subscribe"
-
-msgid "plugins.generic.easySubscribe.page.email.placeholder"
-msgstr "Enter your email"
-
-msgid "plugins.generic.easySubscribe.form.error.exists"
-msgstr "This email address already exists"
-
-msgid "plugins.generic.easySubscribe.form.error.empty"
-msgstr "Email field empty"
-
-msgid "plugins.generic.easySubscribe.form.error.wrong"
-msgstr "Wrong email address"
-
-msgid "plugins.generic.easySubscribe.form.success"
-msgstr "Success"

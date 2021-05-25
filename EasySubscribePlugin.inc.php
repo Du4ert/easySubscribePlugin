@@ -1,27 +1,49 @@
 <?php
 /**
- * @file PluginTemplatePlugin.inc.php
+ * @file EasySubscribePlugin.inc.php
  *
  * Copyright (c) 2017-2021 Simon Fraser University
  * Copyright (c) 2017-2021 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class PluginTemplatePlugin
- * @brief Plugin class for the PluginTemplate plugin.
+ * @class EasySubscribePlugin
+ * @brief Plugin class for the EasySubscribe plugin.
  */
 import('lib.pkp.classes.plugins.GenericPlugin');
-class PluginTemplatePlugin extends GenericPlugin {
-
+class EasySubscribePlugin extends GenericPlugin {
+	public $hookCals = 0;
 	/**
 	 * @copydoc GenericPlugin::register()
 	 */
 	public function register($category, $path, $mainContextId = NULL) {
 		$success = parent::register($category, $path);
+		if ($this->getInstallMigration()) {
+			HookRegistry::register ('PluginRegistry::loadCategory', [$this, 'updateSchema']);
+		}
 		if ($success && $this->getEnabled()) {
-			// Display the publication statement on the article details page
-			HookRegistry::register('Templates::Article::Main', [$this, 'addPublicationStatement']);
+			// Register the static pages DAO.
+			import('plugins.generic.easySubscribe.classes.EasyEmailDAO');
+			$easyEmailDao = new EasyEmailDAO();
+			DAORegistry::registerDAO('EasyEmailDAO', $easyEmailDao);
+
+			HookRegistry::register('LoadHandler', array($this, 'setPageHandler'));
 		}
 		return $success;
+	}
+
+	/**
+	 * Hook callback: register pages for each sushi-lite method
+	 * This URL is of the form: orcidapi/{$orcidrequest}
+	 * @see PKPPageRouter::route()
+	 */
+	function setRegistrationHandler($hookName, $params) {
+		$page = $params[0];
+		if ($this->getEnabled() && $page == 'easysubscribe') {
+			$this->import('RegistrationHandler');
+			define('HANDLER_CLASS', 'RegistrationHandler');
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -33,7 +55,8 @@ class PluginTemplatePlugin extends GenericPlugin {
 	 * @return string
 	 */
 	public function getDisplayName() {
-		return __('plugins.generic.pluginTemplate.displayName');
+		// return __('plugins.generic.easySubscribe.displayName');
+		return 'Easy subscribe plugin';
 	}
 
 	/**
@@ -45,7 +68,8 @@ class PluginTemplatePlugin extends GenericPlugin {
 	 * @return string
 	 */
 	public function getDescription() {
-		return __('plugins.generic.pluginTemplate.description');
+		// return __('plugins.generic.easySubscribe.description');
+		return 'Easy subscribe description*';
 	}
 
 	/**
@@ -121,8 +145,8 @@ class PluginTemplatePlugin extends GenericPlugin {
 			case 'settings':
 
 				// Load the custom form
-				$this->import('PluginTemplateSettingsForm');
-				$form = new PluginTemplateSettingsForm($this);
+				$this->import('EasySubscribeSettingsForm');
+				$form = new EasySubscribeSettingsForm($this);
 
 				// Fetch the form the first time it loads, before
 				// the user has tried to save it
@@ -141,39 +165,38 @@ class PluginTemplatePlugin extends GenericPlugin {
 		return parent::manage($args, $request);
 	}
 
+	public function setPageHandler($hookName, $params) {
+		$page = $params[0];
+		if ($page === 'easysubscribe') {
+			$this->import('EasySubscribePluginHandler');
+			define('HANDLER_CLASS', 'EasySubscribePluginHandler');
+			return true;
+		}
+		return false;
+	}
+
+
 	/**
-	 * Add the publication statement to the article details page.
+	 * @copydoc Plugin::getInstallMigration()
+	 */
+	function getInstallMigration() {
+		$this->import('EasySubscribeSchemaMigration');
+		return new EasySubscribeSchemaMigration();
+	}
+
+		/**
+	 * Called during the install process to install the plugin schema,
+	 * if applicable.
 	 *
-	 * @param string $hookName string
-	 * @param array $params [[
-	 * 	@option array Additional parameters passed with the hook
-	 * 	@option TemplateManager
-	 * 	@option string The HTML output
-	 * ]]
+	 * @param $hookName string
+	 * @param $args array
 	 * @return boolean
 	 */
-	function addPublicationStatement($hookName, $params) {
-
-		// Get the publication statement for this journal or press
-		$context = Application::get()->getRequest()->getContext();
-		$contextId = $context ? $context->getId() : CONTEXT_SITE;
-		$publicationStatement = $this->getSetting($contextId, 'publicationStatement');
-
-		// If the journal or press does not have a publication statement,
-		// check if there is one saved for the site.
-		if (!$publicationStatement && $contextId !== CONTEXT_SITE) {
-			$publicationStatement = $this->getSetting(CONTEXT_SITE, 'publicationStatement');
+	function updateSchema($hookName, $args) {
+		$migration = $this->getInstallMigration();
+		if ( $migration && !$migration->check())  {
+			$migration->up();
 		}
-
-		// Do not modify the output if there is no publication statement
-		if (!$publicationStatement) {
-			return false;
-		}
-
-		// Add the publication statement to the output
-		$output =& $params[2];
-		$output .= '<p class="publication-statement">' . PKPString::stripUnsafeHtml($publicationStatement) . '</p>';
-
 		return false;
 	}
 }

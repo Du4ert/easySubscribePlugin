@@ -1,8 +1,8 @@
 <?php
 import('lib.pkp.classes.form.Form');
-class PluginTemplateSettingsForm extends Form {
+class EasySubscribeSettingsForm extends Form {
 
-	/** @var PluginTemplatePlugin  */
+	/** @var EasySubscribePlugin  */
 	public $plugin;
 
 	/**

@@ -17,16 +17,18 @@ class EasySubscribePlugin extends GenericPlugin {
 	 */
 	public function register($category, $path, $mainContextId = NULL) {
 		$success = parent::register($category, $path);
-		if ($this->getInstallMigration()) {
-			HookRegistry::register ('PluginRegistry::loadCategory', [$this, 'updateSchema']);
-		}
 		if ($success && $this->getEnabled()) {
 			// Register the static pages DAO.
+			HookRegistry::register ('PluginRegistry::loadCategory', [$this, 'updateSchema']);
 			import('plugins.generic.easySubscribe.classes.EasyEmailDAO');
 			$easyEmailDao = new EasyEmailDAO();
 			DAORegistry::registerDAO('EasyEmailDAO', $easyEmailDao);
 
 			HookRegistry::register('LoadHandler', array($this, 'setPageHandler'));
+
+			HookRegistry::register('Mail::send', array($this, 'mailSendCallback'));
+			// Insert AnnouncementEmail div
+			// HookRegistry::register('NotificationManager::AnnouncementNotificationManager', array($this, 'addAnnouncementContent'));
 		}
 		return $success;
 	}
@@ -165,6 +167,9 @@ class EasySubscribePlugin extends GenericPlugin {
 		return parent::manage($args, $request);
 	}
 
+
+
+
 	public function setPageHandler($hookName, $params) {
 		$page = $params[0];
 		if ($page === 'easysubscribe') {
@@ -172,6 +177,28 @@ class EasySubscribePlugin extends GenericPlugin {
 			define('HANDLER_CLASS', 'EasySubscribePluginHandler');
 			return true;
 		}
+		return false;
+	}
+
+
+	function addAnnouncementContent($hookName, $params) {
+		exit('Вызван hook ' . $hookName);
+		$notification =& $params[0];
+		// if ($notification->getType() === NOTIFICATION_TYPE_NEW_ANNOUNCEMENT){
+			$message =& $params[1];
+			$announcementId = $notification->getAssocId();
+			$announcementDao = DAORegistry::getDAO('AnnouncementDAO');
+			$announcement = $announcementDao->getById($announcementId);
+			if ($announcement) {
+				$templateMgr = TemplateManager::getManager();
+				$templateMgr->assign('announcement', $announcement);
+				$message = $templateMgr->fetch($this->getTemplateResource('announcementEmail.tpl'));
+			}
+		// }
+	}
+
+	public function mailSendCallback($hookName, $params) {
+		// echo 'Вызван hook ' . $hookName;
 		return false;
 	}
 

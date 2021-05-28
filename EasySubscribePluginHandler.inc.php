@@ -51,6 +51,21 @@ class EasySubscribePluginHandler extends Handler {
         return $this->printData($output);
     }
 
+    public function hooks($args, $request) {
+        // $output = $this->plugin->pluginName();
+        $output = '';
+        $hooks = HookRegistry::getHooks();
+        $rememberHooks = HookRegistry::getCalledHooks();
+        // var_dump($hooks);
+        echo "<pre>";
+        var_dump($rememberHooks);
+        echo "</pre>";
+        foreach($hooks as $key => $item) {
+            $output .= '<br />' . $key;
+        }
+        return "<pre>" . $output . "</pre>";
+    }
+
 
     private function printData($data) {
         echo "<pre>";

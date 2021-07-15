@@ -46,30 +46,45 @@ class EasySubscribePluginHandler extends Handler {
 
     public function list($args, $request) {
         $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-        $output = $easyEmailDao->getByContextId($this->contextId);
+        $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
+
+        $output = '';
+        
+        foreach ($emailsList as $email) {
+            $output .= '<p>' . $email->getData('email') . '</p>';
+        }
 
         return $this->printData($output);
     }
-
-    public function hooks($args, $request) {
-        // $output = $this->plugin->pluginName();
-        $output = '';
-        $hooks = HookRegistry::getHooks();
-        $rememberHooks = HookRegistry::getCalledHooks();
-        // var_dump($hooks);
-        echo "<pre>";
-        var_dump($rememberHooks);
-        echo "</pre>";
-        foreach($hooks as $key => $item) {
-            $output .= '<br />' . $key;
-        }
-        return "<pre>" . $output . "</pre>";
-    }
-
 
     private function printData($data) {
         echo "<pre>";
         var_dump($data);
         echo "</pre>";
+    }
+
+    public function sendToSubscribers($subject, $body) {
+        import('lib.pkp.classes.mail.Mail');
+        $fromEmail = $this->$context->getData('contactEmail');
+        $fromName = $this->$context->getData('contactName');
+
+        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+        $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
+
+		foreach ($emailsList as $email) {
+					$mail = new Mail();
+					$mail->setFrom($fromEmail, $fromName);
+					$mail->setRecipients([
+						[
+							'name' => 'Dear subscriber',
+							'email' => $email,
+						],
+					]);
+					$mail->setSubject($subject);
+					$mail->setBody($body);
+					$mail->send();
+				}
+
+        return $subject . $body;
     }
 }

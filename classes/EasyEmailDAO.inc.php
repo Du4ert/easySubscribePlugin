@@ -43,7 +43,7 @@ class EasyEmailDAO extends DAO {
 	 */
 	function getByContextId($contextId, $rangeInfo = null) {
 		$result = $this->retrieveRange(
-			'SELECT * FROM easysubscribe_emails WHERE context_id = ?',
+			'SELECT email FROM easysubscribe_emails WHERE context_id = ?',
 			[(int) $contextId],
 			$rangeInfo
 		);

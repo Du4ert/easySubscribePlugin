@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file EasySubscribePlugin.inc.php
  *
@@ -10,30 +11,31 @@
  * @brief Plugin class for the EasySubscribe plugin.
  */
 import('lib.pkp.classes.plugins.GenericPlugin');
-class EasySubscribePlugin extends GenericPlugin {
-	public $hookCals = 0;
-	const GROUP_READERS_ID = 17; //? найти, где определяется id и переприсвоить
+class EasySubscribePlugin extends GenericPlugin
+{
+	const GROUP_READERS_ID = 17; //! найти, где определяется id и переприсвоить
+	const ISSUE_IGNORE_LIST = ['just_accepted'];
 	/**
 	 * @copydoc GenericPlugin::register()
 	 */
-	public function register($category, $path, $mainContextId = NULL) {
+	public function register($category, $path, $mainContextId = NULL)
+	{
 		$success = parent::register($category, $path);
 		if ($success && $this->getEnabled()) {
 			// Register the static pages DAO.
-			HookRegistry::register ('PluginRegistry::loadCategory', [$this, 'updateSchema']);
+			HookRegistry::register('PluginRegistry::loadCategory', [$this, 'updateSchema']);
 			import('plugins.generic.easySubscribe.classes.EasyEmailDAO');
 			$easyEmailDao = new EasyEmailDAO();
 			DAORegistry::registerDAO('EasyEmailDAO', $easyEmailDao);
 
 			HookRegistry::register('LoadHandler', array($this, 'setPageHandler'));
-			
-			// HookRegistry::register('Mail::send', array($this, 'mailSendCallback'));
 
-			HookRegistry::register('APIHandler::endpoints', array($this, 'bulkNotificationCallback'));
 
-			HookRegistry::register('Announcement::add', array($this, 'announcementAddCallback'));
+			HookRegistry::register('APIHandler::endpoints', array($this, 'bulkNotificationCallback'));			//* рассылка по пользователям для читателей и подписчиков
 
-			HookRegistry::register('IssueGridHandler::publishIssue', array($this, 'publishIssueCallback'));
+			HookRegistry::register('Announcement::add', array($this, 'announcementAddCallback'));				//* публикация объявления
+
+			HookRegistry::register('IssueGridHandler::publishIssue', array($this, 'publishIssueCallback'));		//* публикация выпуска
 		}
 		return $success;
 	}
@@ -43,7 +45,8 @@ class EasySubscribePlugin extends GenericPlugin {
 	 * This URL is of the form: orcidapi/{$orcidrequest}
 	 * @see PKPPageRouter::route()
 	 */
-	function setRegistrationHandler($hookName, $params) {
+	function setRegistrationHandler($hookName, $params)
+	{
 		$page = $params[0];
 		if ($this->getEnabled() && $page == 'easysubscribe') {
 			$this->import('RegistrationHandler');
@@ -61,7 +64,8 @@ class EasySubscribePlugin extends GenericPlugin {
 	 *
 	 * @return string
 	 */
-	public function getDisplayName() {
+	public function getDisplayName()
+	{
 		// return __('plugins.generic.easySubscribe.displayName');
 		return 'Easy subscribe plugin';
 	}
@@ -74,7 +78,8 @@ class EasySubscribePlugin extends GenericPlugin {
 	 *
 	 * @return string
 	 */
-	public function getDescription() {
+	public function getDescription()
+	{
 		// return __('plugins.generic.easySubscribe.description');
 		return 'Easy subscribe description*';
 	}
@@ -84,7 +89,8 @@ class EasySubscribePlugin extends GenericPlugin {
 	 *
 	 * @return string
 	 */
-	public function isSitePlugin() {
+	public function isSitePlugin()
+	{
 		return true;
 	}
 
@@ -96,7 +102,8 @@ class EasySubscribePlugin extends GenericPlugin {
 	 * @param array $actionArgs
 	 * @return array
 	 */
-	public function getActions($request, $actionArgs) {
+	public function getActions($request, $actionArgs)
+	{
 
 		// Get the existing actions
 		$actions = parent::getActions($request, $actionArgs);
@@ -147,7 +154,8 @@ class EasySubscribePlugin extends GenericPlugin {
 	 * @param Request $request
 	 * @return JSONMessage
 	 */
-	public function manage($args, $request) {
+	public function manage($args, $request)
+	{
 		switch ($request->getUserVar('verb')) {
 			case 'settings':
 
@@ -175,7 +183,8 @@ class EasySubscribePlugin extends GenericPlugin {
 
 
 
-	public function setPageHandler($hookName, $params) {
+	public function setPageHandler($hookName, $params)
+	{
 		$page = $params[0];
 		if ($page === 'easysubscribe') {
 			$this->import('EasySubscribePluginHandler');
@@ -185,18 +194,20 @@ class EasySubscribePlugin extends GenericPlugin {
 		return false;
 	}
 
-	
-	public function mailSendCallback($hookName, $params) {
 
-		
-	return false;
-}
+	public function mailSendCallback($hookName, $params)
+	{
 
-	public function announcementAddCallback($hookName, $params) {
+
+		return false;
+	}
+
+	public function announcementAddCallback($hookName, $params)
+	{
 		$announcement = $params[0];
 
 		$sendEmail = $announcement->getData('sendEmail');
-		
+
 		if (!$sendEmail) {
 			return false;
 		}
@@ -218,32 +229,33 @@ class EasySubscribePlugin extends GenericPlugin {
 		$body .= '">';
 		$body .= $url;
 		$body .= "</a>";
-		
+
 		$this->sendToSubscribers($subject, $body, $context);
-		
+
 		return true;
 	}
 
-	public function bulkNotificationCallback($hookName, $params) {
-			$handler = $params[1];
-			$groupIds = $_POST['userGroupIds'];
-			$targetGroupId = EasySubscribePlugin::GROUP_READERS_ID;
+	public function bulkNotificationCallback($hookName, $params)
+	{
+		$handler = $params[1];
+		$groupIds = $_POST['userGroupIds'];
+		$targetGroupId = EasySubscribePlugin::GROUP_READERS_ID;
 
-			 if (get_class($handler) === 'PKPEmailHandler' && in_array($targetGroupId, $groupIds))
-			{
-				$context = Application::get()->getRequest()->getContext();
-				$subject = $_POST['subject'];
-				$body = $_POST['body'];
+		if (get_class($handler) === 'PKPEmailHandler' && in_array($targetGroupId, $groupIds)) {
+			$context = Application::get()->getRequest()->getContext();
+			$subject = $_POST['subject'];
+			$body = $_POST['body'];
 
 
-				$this->sendToSubscribers($subject, $body, $context);
-				return true;
-			}
-			
+			$this->sendToSubscribers($subject, $body, $context);
+			return true;
+		}
+
 		return false;
 	}
 
-	public function publishIssueCallback($hookName, $params) {
+	public function publishIssueCallback($hookName, $params)
+	{
 		if ($_REQUEST['sendIssueNotification']) {
 			$request = Application::get()->getRequest();
 			$context = $request->getContext();
@@ -251,13 +263,13 @@ class EasySubscribePlugin extends GenericPlugin {
 			$issue = $params[0];
 			$issueUrl = $issue->getData('urlPath');
 
-			//? if ($issueUrl === 'just_accepted') {
-			// 	return false;
-			//? }
+			if (in_array($issueUrl, EasySubscribePlugin::ISSUE_IGNORE_LIST)) {
+				return false;
+			}
 
 			$title = '<p>Опубликован новый выпуск: ' . $issue->getLocalizedData('title') . '</p>';
 			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
-			
+
 			$subject = 'Новое уведомление с сайта ' . $context->getLocalizedName('ru_RU');
 
 			$body = '<p>';
@@ -265,7 +277,7 @@ class EasySubscribePlugin extends GenericPlugin {
 			$body .= '<br/>';
 			$body .= "Доступен по ссылке: <a href='$url'>$url</a>";
 			$body .= '</p>';
-			
+
 
 			$this->sendToSubscribers($subject, $body, $context);
 			return true;
@@ -273,41 +285,43 @@ class EasySubscribePlugin extends GenericPlugin {
 		return false;
 	}
 
-	public function sendToSubscribers($subject, $body, $context) {
-        import('lib.pkp.classes.mail.Mail');
-        $fromEmail = $context->getData('contactEmail');
-        $fromName = $context->getData('contactName');
+	public function sendToSubscribers($subject, $body, $context)
+	{
+		import('lib.pkp.classes.mail.Mail');
+		$fromEmail = $context->getData('contactEmail');
+		$fromName = $context->getData('contactName');
 
-        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-        $emailsList = $easyEmailDao->getByContextId($context->getId())->toArray();
+		$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+		$emailsList = $easyEmailDao->getByContextId($context->getId())->toArray();
 
 		foreach ($emailsList as $email) {
-					$mail = new Mail();
-					$mail->setFrom($fromEmail, $fromName);
-					$mail->setRecipients([
-						[
-							'name' => '',
-							'email' => $email->getData('email'),
-						],
-					]);
-					$mail->setSubject($subject);
-					$mail->setBody($body);
-					$mail->send();
-				}
+			$mail = new Mail();
+			$mail->setFrom($fromEmail, $fromName);
+			$mail->setRecipients([
+				[
+					'name' => '',
+					'email' => $email->getData('email'),
+				],
+			]);
+			$mail->setSubject($subject);
+			$mail->setBody($body);
+			$mail->send();
+		}
 
-        return $subject . $body;
-    }
+		return $subject . $body;
+	}
 
 
 	/**
 	 * @copydoc Plugin::getInstallMigration()
 	 */
-	function getInstallMigration() {
+	function getInstallMigration()
+	{
 		$this->import('EasySubscribeSchemaMigration');
 		return new EasySubscribeSchemaMigration();
 	}
 
-		/**
+	/**
 	 * Called during the install process to install the plugin schema,
 	 * if applicable.
 	 *
@@ -315,9 +329,10 @@ class EasySubscribePlugin extends GenericPlugin {
 	 * @param $args array
 	 * @return boolean
 	 */
-	function updateSchema($hookName, $args) {
+	function updateSchema($hookName, $args)
+	{
 		$migration = $this->getInstallMigration();
-		if ( $migration && !$migration->check())  {
+		if ($migration && !$migration->check()) {
 			$migration->up();
 		}
 		return false;

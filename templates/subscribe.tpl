@@ -1,13 +1,5 @@
 {**
- * templates/frontend/pages/easySubscribe.tpl
- *
- * Copyright (c) 2014-2017 Simon Fraser University Library
- * Copyright (c) 2003-2017 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
- *
- * @brief Display the page to view the editorial team.
- *
- * @uses $currentJournal Journal The current journal
+ * templates/frontend/pages/subscribe.tpl
  *}
  {include file="frontend/components/header.tpl" pageTitle="plugins.generic.easySubscribe.page.title"}
 
@@ -17,7 +9,7 @@
      {* Page Title *}
      <div class="page-header">
          {include file="frontend/components/editLink.tpl" page="management" op="settings" path="" anchor="" sectionTitleKey=""}
-         <h1>{translate key="plugins.generic.easySubscribe.page.title"}</h1>
+         <h1>{translate key="plugins.generic.easySubscribe.page.subscribe.title"}</h1>
      </div>
      {* /Page Title *}
 

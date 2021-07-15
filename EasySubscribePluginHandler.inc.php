@@ -44,6 +44,36 @@ class EasySubscribePluginHandler extends Handler {
         return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
     }
 
+    public function unsubscribe($args, $request) {
+        $templateMgr = TemplateManager::getManager($request);
+        $email = $request->getUserVar('email');
+        $id = $request->getUserVar('id');
+        
+        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+        $message = '';
+
+        $easyEmail = $easyEmailDao->getById($this->contextId, $id);
+
+        if ($easyEmail && $easyEmail->getEmail() === $email) {
+            $easyEmailDao->deleteById($id);
+
+            $message = __('plugins.generic.easySubscribe.unsubscribe.success');
+
+            $templateMgr->assign([
+                'status' => 'success',
+                'message' => $message,
+            ]);
+        } 
+        else {
+        $message = __('plugins.generic.easySubscribe.unsubscribe.error');
+        $templateMgr->assign([
+            'status' => 'error',
+            'message' => $message,
+		]);
+        }
+        return $templateMgr->display($this->plugin->getTemplateResource('unsubscribe.tpl'));
+    }
+
     public function list($args, $request) {
         $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
         $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
@@ -61,30 +91,5 @@ class EasySubscribePluginHandler extends Handler {
         echo "<pre>";
         var_dump($data);
         echo "</pre>";
-    }
-
-    public function sendToSubscribers($subject, $body) {
-        import('lib.pkp.classes.mail.Mail');
-        $fromEmail = $this->$context->getData('contactEmail');
-        $fromName = $this->$context->getData('contactName');
-
-        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-        $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
-
-		foreach ($emailsList as $email) {
-					$mail = new Mail();
-					$mail->setFrom($fromEmail, $fromName);
-					$mail->setRecipients([
-						[
-							'name' => 'Dear subscriber',
-							'email' => $email,
-						],
-					]);
-					$mail->setSubject($subject);
-					$mail->setBody($body);
-					$mail->send();
-				}
-
-        return $subject . $body;
     }
 }

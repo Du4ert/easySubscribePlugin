@@ -267,13 +267,12 @@ class EasySubscribePlugin extends GenericPlugin
 				return false;
 			}
 
-			$title = '<p>Опубликован новый выпуск: ' . $issue->getLocalizedData('title') . '</p>';
 			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
 
-			$subject = 'Новое уведомление с сайта ' . $context->getLocalizedName('ru_RU');
+			$subject = 'Опубликован новый выпуск: ' . $context->getLocalizedName('ru_RU')';
 
 			$body = '<p>';
-			$body .= $title;
+			$body .= $issue->getLocalizedData('title');
 			$body .= '<br/>';
 			$body .= "Доступен по ссылке: <a href='$url'>$url</a>";
 			$body .= '</p>';
@@ -287,14 +286,25 @@ class EasySubscribePlugin extends GenericPlugin
 
 	public function sendToSubscribers($subject, $body, $context)
 	{
+		//!! Хорошо бы обойтись без request'а
+			$request = Application::get()->getRequest();
+		//!!
+
 		import('lib.pkp.classes.mail.Mail');
 		$fromEmail = $context->getData('contactEmail');
 		$fromName = $context->getData('contactName');
+		$headerTemplate= '<p>Автоматическое уведомление с сайта ' . $context->getLocalizedName('ru_RU') . '</p>';
+		$footerTemplate = '<p>Чтобы отписаться перейдите по ссылке <a href="URL">URL</a></p>';
+
+		$unsubscribeUrl = $request->getBaseUrl() . '/' . $context->getPath() . '/easysubscribe/unsubscribe';
 
 		$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
 		$emailsList = $easyEmailDao->getByContextId($context->getId())->toArray();
 
 		foreach ($emailsList as $email) {
+			$header = $headerTemplate;
+			$footer = str_replace('URL', $unsubscribeUrl . '?email=' . $email->getData('email') . '&id=' . $email->getId(), $footerTemplate);
+
 			$mail = new Mail();
 			$mail->setFrom($fromEmail, $fromName);
 			$mail->setRecipients([
@@ -304,7 +314,7 @@ class EasySubscribePlugin extends GenericPlugin
 				],
 			]);
 			$mail->setSubject($subject);
-			$mail->setBody($body);
+			$mail->setBody($header . $body . $footer);
 			$mail->send();
 		}
 

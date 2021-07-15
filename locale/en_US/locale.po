@@ -23,6 +23,10 @@ msgstr "Subscribe"
 msgid "plugins.generic.easySubscribe.page.subscribe"
 msgstr "Subscribe"
 
+msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
+msgstr "Unsubscribe"
+
+
 msgid "plugins.generic.easySubscribe.page.email.placeholder"
 msgstr "Enter your email"
 
@@ -37,3 +41,10 @@ msgstr "Wrong email address"
 
 msgid "plugins.generic.easySubscribe.form.success"
 msgstr "Success"
+
+msgid "plugins.generic.easySubscribe.unsubscribe.success"
+msgstr "Success"
+
+msgid "plugins.generic.easySubscribe.unsubscribe.error"
+msgstr "Wrong email address or id"
+

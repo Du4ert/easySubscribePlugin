@@ -12,10 +12,35 @@ msgstr ""
 "Language: \n"
 
 msgid "plugins.generic.easySubscribe.displayName"
-msgstr "Easy subscribe"
+msgstr "Easy subscribe - простая форма подписки"
 
 msgid "plugins.generic.easySubscribe.description"
-msgstr "Plugin for subscribe to journal notification without user  registration."
+msgstr "Подписка на объявления, рассылку уведомлений читателям и публикацию выпусков."
 
-msgid "plugins.generic.easySubscribe.page.title"
-msgstr "Subscribe"
+msgid "plugins.generic.easySubscribe.page.subscribe.title"
+msgstr "Подписаться"
+
+msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
+msgstr "Отписаться"
+
+
+msgid "plugins.generic.easySubscribe.page.email.placeholder"
+msgstr "Введите email"
+
+msgid "plugins.generic.easySubscribe.form.error.exists"
+msgstr "Этот email адрес уже используется для подписки"
+
+msgid "plugins.generic.easySubscribe.form.error.empty"
+msgstr "Заполните поле"
+
+msgid "plugins.generic.easySubscribe.form.error.wrong"
+msgstr "Неправильный email"
+
+msgid "plugins.generic.easySubscribe.form.success"
+msgstr "Вы успешно подписались на рассылки. Спасибо."
+
+msgid "plugins.generic.easySubscribe.unsubscribe.success"
+msgstr "Вы успешно отписались на рассылки. Возвращайтесь ("
+
+msgid "plugins.generic.easySubscribe.unsubscribe.error"
+msgstr "Неправильный email или id"

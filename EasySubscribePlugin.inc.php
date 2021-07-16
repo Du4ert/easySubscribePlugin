@@ -27,6 +27,8 @@ class EasySubscribePlugin extends GenericPlugin
 			import('plugins.generic.easySubscribe.classes.EasyEmailDAO');
 			$easyEmailDao = new EasyEmailDAO();
 			DAORegistry::registerDAO('EasyEmailDAO', $easyEmailDao);
+			$this->import('EasySubscribeBlockPlugin');
+			PluginRegistry::register('blocks', new EasySubscribeBlockPlugin($this), $this->getPluginPath());
 
 			HookRegistry::register('LoadHandler', array($this, 'setPageHandler'));
 
@@ -221,14 +223,9 @@ class EasySubscribePlugin extends GenericPlugin
 		$descriptionShort = $announcement->getLocalizedDescriptionShort('ru_RU');
 		$url = $request->getBaseUrl() . '/' . $context->getPath() . '/announcement/view/' . $announcement->getData('id');
 
-		$body .= '<h1>Новое объявление:</h1>';
-		$body .= "<h2>$title</h2>";
-		$body .= "$descriptionShort";
-		$body .= 'Подробнее по ссылке: <a href="';
-		$body .= $url;
-		$body .= '">';
-		$body .= $url;
-		$body .= "</a>";
+		$body .= "<p>Новое объявление: $title</p>";
+		$body .= "<p>$descriptionShort</p>";
+		$body .= 'Подробнее по ссылке: <a href="' . $url . '">' . $url . '</a>';
 
 		$this->sendToSubscribers($subject, $body, $context);
 
@@ -267,13 +264,15 @@ class EasySubscribePlugin extends GenericPlugin
 				return false;
 			}
 
+			
+
 			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
 
-			$subject = 'Опубликован новый выпуск: ' . $context->getLocalizedName('ru_RU')';
+			$subject = 'Опубликован новый выпуск: ' . $context->getLocalizedName('ru_RU');
 
 			$body = '<p>';
-			$body .= $issue->getLocalizedData('title');
-			$body .= '<br/>';
+			$body .= 'Опубликован новый выпуск: ' . $issue->getIssueIdentification([], 'ru_RU');
+			$body .= '</p><p>';
 			$body .= "Доступен по ссылке: <a href='$url'>$url</a>";
 			$body .= '</p>';
 
@@ -293,8 +292,9 @@ class EasySubscribePlugin extends GenericPlugin
 		import('lib.pkp.classes.mail.Mail');
 		$fromEmail = $context->getData('contactEmail');
 		$fromName = $context->getData('contactName');
-		$headerTemplate= '<p>Автоматическое уведомление с сайта ' . $context->getLocalizedName('ru_RU') . '</p>';
-		$footerTemplate = '<p>Чтобы отписаться перейдите по ссылке <a href="URL">URL</a></p>';
+		$headerTemplate= '<small>Это автоматическое уведомление с сайта ' . $context->getLocalizedName('ru_RU') . '.</small>';
+		$footerTemplate = '<small>Чтобы отписаться от рассылки, перейдите по ссылке: <a href="URL">URL</a></small>';
+
 
 		$unsubscribeUrl = $request->getBaseUrl() . '/' . $context->getPath() . '/easysubscribe/unsubscribe';
 
@@ -314,7 +314,7 @@ class EasySubscribePlugin extends GenericPlugin
 				],
 			]);
 			$mail->setSubject($subject);
-			$mail->setBody($header . $body . $footer);
+			$mail->setBody($body . "<p>$header <br/> $footer</p>");
 			$mail->send();
 		}
 

@@ -17,11 +17,17 @@ msgstr "Easy subscribe - простая форма подписки"
 msgid "plugins.generic.easySubscribe.description"
 msgstr "Подписка на объявления, рассылку уведомлений читателям и публикацию выпусков."
 
-msgid "plugins.generic.easySubscribe.page.subscribe.title"
+msgid "plugins.generic.easySubscribe.page.subscribe"
 msgstr "Подписаться"
+
+msgid "plugins.generic.easySubscribe.page.subscribe.title"
+msgstr "Подписаться на рассылку"
 
 msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
 msgstr "Отписаться"
+
+msgid "plugins.generic.easySubscribe.breadcrumbs"
+msgstr "Подписка"
 
 
 msgid "plugins.generic.easySubscribe.page.email.placeholder"
@@ -36,8 +42,14 @@ msgstr "Заполните поле"
 msgid "plugins.generic.easySubscribe.form.error.wrong"
 msgstr "Неправильный email"
 
+msgid "plugins.generic.easySubscribe.form.button"
+msgstr "Отправить email"
+
+msgid "plugins.generic.easySubscribe.page.register.error"
+msgstr "Пожалуйста используйте стандартную форму подписки:"
+
 msgid "plugins.generic.easySubscribe.form.success"
-msgstr "Вы успешно подписались на рассылки. Спасибо."
+msgstr "Вы успешно подписались на рассылку. Спасибо."
 
 msgid "plugins.generic.easySubscribe.unsubscribe.success"
 msgstr "Вы успешно отписались на рассылки. Возвращайтесь ("

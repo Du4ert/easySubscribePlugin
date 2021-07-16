@@ -23,9 +23,15 @@ msgstr "Subscribe"
 msgid "plugins.generic.easySubscribe.page.subscribe"
 msgstr "Subscribe"
 
+msgid "plugins.generic.easySubscribe.page.subscribe.title"
+msgstr "Subscribe to email send"
+
+
 msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
 msgstr "Unsubscribe"
 
+msgid "plugins.generic.easySubscribe.breadcrumbs"
+msgstr "Subscription"
 
 msgid "plugins.generic.easySubscribe.page.email.placeholder"
 msgstr "Enter your email"
@@ -38,6 +44,12 @@ msgstr "Email field empty"
 
 msgid "plugins.generic.easySubscribe.form.error.wrong"
 msgstr "Wrong email address"
+
+msgid "plugins.generic.easySubscribe.form.button"
+msgstr "Apply email"
+
+msgid "plugins.generic.easySubscribe.page.register.error"
+msgstr "Please use standard subsription form:"
 
 msgid "plugins.generic.easySubscribe.form.success"
 msgstr "Success"

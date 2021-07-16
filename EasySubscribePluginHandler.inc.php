@@ -19,10 +19,20 @@ class EasySubscribePluginHandler extends Handler {
     public function register($args, $request) {
         $templateMgr = TemplateManager::getManager($request);
         $newEmail = $request->getUserVar('email');
+        $csrfToken = $request->getUserVar('csrfToken');
         
         $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
         $message = '';
 
+        if (!$csrfToken) {
+            $templateMgr->assign([
+                'errorMsg' => 'plugins.generic.easySubscribe.page.register.error',
+                'backLink' => $request->url(null, null, 'index'),
+                'backLinkLabel' => 'plugins.generic.easySubscribe.page.subscribe.title',
+            ]);
+
+            return $templateMgr->display('frontend/pages/error.tpl');
+        }
         if (!$easyEmailDao->getByEmail($this->contextId, $newEmail) && !!$newEmail) {
             $easyEmail = $easyEmailDao->newDataObject();
             $easyEmail->setEmail((string) $newEmail, null);
@@ -74,22 +84,18 @@ class EasySubscribePluginHandler extends Handler {
         return $templateMgr->display($this->plugin->getTemplateResource('unsubscribe.tpl'));
     }
 
-    public function list($args, $request) {
-        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-        $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
+    //! Функционал для тестирования. Нужно перенести в админ панель
+    // public function list($args, $request) {
+    //     $templateMgr = TemplateManager::getManager($request);
+    //     $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+    //     $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
 
-        $output = '';
-        
-        foreach ($emailsList as $email) {
-            $output .= '<p>' . $email->getData('email') . '</p>';
-        }
+    //     $templateMgr->assign([
+    //         'emailsList' => $emailsList,
+    //     ]);
+    
 
-        return $this->printData($output);
-    }
+    //     return $templateMgr->display($this->plugin->getTemplateResource('list.tpl'));
+    // }
 
-    private function printData($data) {
-        echo "<pre>";
-        var_dump($data);
-        echo "</pre>";
-    }
 }

@@ -239,7 +239,7 @@ class EasySubscribePlugin extends GenericPlugin
 		$targetGroupId = EasySubscribePlugin::GROUP_READERS_ID;
 
 		if (get_class($handler) === 'PKPEmailHandler' && in_array($targetGroupId, $groupIds)) {
-			$request = Application::get()->getRequest()
+			$request = Application::get()->getRequest();
 			$context = $request->getContext();
 			$subject = $_POST['subject'];
 			$body = $_POST['body'];

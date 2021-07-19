@@ -217,10 +217,10 @@ class EasySubscribePlugin extends GenericPlugin
 		$request = Application::get()->getRequest();
 		$context = $request->getContext();
 
-		$subject = 'Новое уведомление с сайта ' . $context->getLocalizedName('ru_RU');
+		$subject = 'Новое уведомление с сайта ' . $context->getName('ru_RU');
 		$body = '';
-		$title = $announcement->getLocalizedTitle('ru_RU');
-		$descriptionShort = $announcement->getLocalizedDescriptionShort('ru_RU');
+		$title = $announcement->getTitle('ru_RU');
+		$descriptionShort = $announcement->getDescriptionShort('ru_RU');
 		$url = $request->getBaseUrl() . '/' . $context->getPath() . '/announcement/view/' . $announcement->getData('id');
 
 		$body .= "<p>Новое объявление: $title</p>";
@@ -239,7 +239,8 @@ class EasySubscribePlugin extends GenericPlugin
 		$targetGroupId = EasySubscribePlugin::GROUP_READERS_ID;
 
 		if (get_class($handler) === 'PKPEmailHandler' && in_array($targetGroupId, $groupIds)) {
-			$context = Application::get()->getRequest()->getContext();
+			$request = Application::get()->getRequest()
+			$context = $request->getContext();
 			$subject = $_POST['subject'];
 			$body = $_POST['body'];
 
@@ -268,7 +269,7 @@ class EasySubscribePlugin extends GenericPlugin
 
 			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
 
-			$subject = 'Опубликован новый выпуск: ' . $context->getLocalizedName('ru_RU');
+			$subject = 'Опубликован новый выпуск: ' . $context->getName('ru_RU');
 
 			$body = '<p>';
 			$body .= 'Опубликован новый выпуск: ' . $issue->getIssueIdentification([], 'ru_RU');
@@ -292,7 +293,7 @@ class EasySubscribePlugin extends GenericPlugin
 		import('lib.pkp.classes.mail.Mail');
 		$fromEmail = $context->getData('contactEmail');
 		$fromName = $context->getData('contactName');
-		$headerTemplate= '<small>Это автоматическое уведомление с сайта ' . $context->getLocalizedName('ru_RU') . '.</small>';
+		$headerTemplate= '<small>Это автоматическое уведомление с сайта ' . $context->getName('ru_RU') . '.</small>';
 		$footerTemplate = '<small>Чтобы отписаться от рассылки, перейдите по ссылке: <a href="URL">URL</a></small>';
 
 

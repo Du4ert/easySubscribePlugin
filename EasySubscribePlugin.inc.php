@@ -47,12 +47,13 @@ class EasySubscribePlugin extends GenericPlugin
 	 * This URL is of the form: orcidapi/{$orcidrequest}
 	 * @see PKPPageRouter::route()
 	 */
-	function setRegistrationHandler($hookName, $params)
+
+	public function setPageHandler($hookName, $params)
 	{
 		$page = $params[0];
-		if ($this->getEnabled() && $page == 'easysubscribe') {
-			$this->import('RegistrationHandler');
-			define('HANDLER_CLASS', 'RegistrationHandler');
+		if ($page === 'easysubscribe') {
+			$this->import('EasySubscribePluginHandler');
+			define('HANDLER_CLASS', 'EasySubscribePluginHandler');
 			return true;
 		}
 		return false;
@@ -182,27 +183,6 @@ class EasySubscribePlugin extends GenericPlugin
 		return parent::manage($args, $request);
 	}
 
-
-
-
-	public function setPageHandler($hookName, $params)
-	{
-		$page = $params[0];
-		if ($page === 'easysubscribe') {
-			$this->import('EasySubscribePluginHandler');
-			define('HANDLER_CLASS', 'EasySubscribePluginHandler');
-			return true;
-		}
-		return false;
-	}
-
-
-	public function mailSendCallback($hookName, $params)
-	{
-
-
-		return false;
-	}
 
 	public function announcementAddCallback($hookName, $params)
 	{

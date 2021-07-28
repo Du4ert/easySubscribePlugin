@@ -14,7 +14,7 @@
 
  <div class="content">
      <a class="block_make_submission_link" href="{url router=$smarty.const.ROUTE_PAGE page="easysubscribe"}">
-         {translate key="plugins.generic.easySubscribe.page.subscribe.title"}
+         {translate key="plugins.generic.easySubscribe.page.subscribe"}
      </a>
  </div>
 </div>

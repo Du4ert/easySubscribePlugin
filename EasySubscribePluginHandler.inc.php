@@ -12,11 +12,24 @@ class EasySubscribePluginHandler extends Handler {
 
     public function index($args, $request) {
         $templateMgr = TemplateManager::getManager($request);
+        $this->captchaEnabled = Config::getVar('captcha', 'captcha_on_register') && Config::getVar('captcha', 'recaptcha');
+		
+        if ($this->captchaEnabled) {
+			$publicKey = Config::getVar('captcha', 'recaptcha_public_key');
+			$reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
+			$templateMgr->assign(array(
+				'reCaptchaHtml' => $reCaptchaHtml,
+				'captchaEnabled' => true,
+			));
+            $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(),0,2));
+		}
         return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
     }
 
 
     public function register($args, $request) {
+
+
         $templateMgr = TemplateManager::getManager($request);
         $newEmail = $request->getUserVar('email');
         $csrfToken = $request->getUserVar('csrfToken');

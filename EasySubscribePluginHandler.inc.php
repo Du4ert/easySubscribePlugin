@@ -3,16 +3,17 @@ import('classes.handler.Handler');
 class EasySubscribePluginHandler extends Handler {
     public $contextId;
     public $plugin;
+    public $captchaEnabled;
 
     function __construct($request) {
         parent::__construct();
         $this->contextId = $request->getContext()->getId();
         $this->plugin = PluginRegistry::getPlugin('generic', 'easysubscribeplugin');
+        $this->captchaEnabled = Config::getVar('captcha', 'captcha_on_register') && Config::getVar('captcha', 'recaptcha');
     }
 
     public function index($args, $request) {
         $templateMgr = TemplateManager::getManager($request);
-        $this->captchaEnabled = Config::getVar('captcha', 'captcha_on_register') && Config::getVar('captcha', 'recaptcha');
 		
         if ($this->captchaEnabled) {
 			$publicKey = Config::getVar('captcha', 'recaptcha_public_key');
@@ -28,11 +29,10 @@ class EasySubscribePluginHandler extends Handler {
 
 
     public function register($args, $request) {
-
-
         $templateMgr = TemplateManager::getManager($request);
         $newEmail = $request->getUserVar('email');
         $csrfToken = $request->getUserVar('csrfToken');
+        $recaptcha = $request->getUserVar('g-recaptcha-response');
         
         $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
         $message = '';
@@ -46,6 +46,32 @@ class EasySubscribePluginHandler extends Handler {
 
             return $templateMgr->display('frontend/pages/error.tpl');
         }
+
+        if($this->captchaEnabled)
+        {
+            $secret = Config::getVar('captcha', 'recaptcha_secret_key');
+            $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$recaptcha);
+            $responseData = json_decode($verifyResponse);
+            if(!$responseData->success) {
+                if ($this->captchaEnabled) {
+                    $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
+                    $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
+                    $templateMgr->assign(array(
+                        'reCaptchaHtml' => $reCaptchaHtml,
+                        'captchaEnabled' => true,
+                    ));
+                    $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(),0,2));
+                }
+                $message = __('plugins.generic.easySubscribe.form.captcha');
+                $templateMgr->assign([
+                    'status' => 'error',
+                    'message' => $message,
+                ]);
+                return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
+            }
+         }
+
+
         if (!$easyEmailDao->getByEmail($this->contextId, $newEmail) && !!$newEmail) {
             $easyEmail = $easyEmailDao->newDataObject();
             $easyEmail->setEmail((string) $newEmail, null);

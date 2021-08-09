@@ -51,6 +51,9 @@ msgstr "Apply email"
 msgid "plugins.generic.easySubscribe.page.register.error"
 msgstr "Please use standard subsription form:"
 
+msgid "plugins.generic.easySubscribe.form.captcha"
+msgstr "Captcha error"
+
 msgid "plugins.generic.easySubscribe.form.success"
 msgstr "Success"
 

@@ -57,7 +57,7 @@
                 </div>
             </fieldset>
         {/if}
-    
+
         <div class="buttons">
             <button class="btn btn-primary submit" name="submit" type="submit">
                 {translate key="plugins.generic.easySubscribe.form.button"}
@@ -68,32 +68,5 @@
      
  </div><!-- .page -->
 
- <script>
- // Disable submit button if inputs are empty
-    let form = document.getElementById('register');
-    let submit = form.elements.submit;
-    let inputs = form.querySelectorAll('input:required');
-    submit.disabled = true;
-
-    inputs.forEach(item => {
-     item.addEventListener('input', checkForm);
-        
-    });
-
-    function checkForm() {
-     
-        for (item of inputs) {
-            if ((item.type === 'text' || item.type === 'email') && item.value == '') {
-                submit.setAttribute('disabled', true);
-                break;
-            } else if(item.type === 'checkbox' && !item.checked) {
-                submit.setAttribute('disabled', true);
-                break;
-            } else {
-                submit.disabled = false;
-            }
-     }
-    }
- </script>
  
  {include file="common/frontend/footer.tpl"}

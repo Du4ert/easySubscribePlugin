@@ -17,7 +17,7 @@ class EasySubscribePluginHandler extends Handler {
 		
         if ($this->captchaEnabled) {
 			$publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-			$reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '" required></div>';
+			$reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
 			$templateMgr->assign(array(
 				'reCaptchaHtml' => $reCaptchaHtml,
 				'captchaEnabled' => true,
@@ -43,6 +43,7 @@ class EasySubscribePluginHandler extends Handler {
                 'backLink' => $request->url(null, null, 'index'),
                 'backLinkLabel' => 'plugins.generic.easySubscribe.page.subscribe.title',
             ]);
+            $templateMgr->addJavaScript('subscribe', 'js/subscribe.js');
 
             return $templateMgr->display('frontend/pages/error.tpl');
         }
@@ -55,7 +56,7 @@ class EasySubscribePluginHandler extends Handler {
             if(!$responseData->success) {
                 if ($this->captchaEnabled) {
                     $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-                    $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '" required></div>';
+                    $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
                     $templateMgr->assign(array(
                         'reCaptchaHtml' => $reCaptchaHtml,
                         'captchaEnabled' => true,
@@ -88,6 +89,7 @@ class EasySubscribePluginHandler extends Handler {
         $templateMgr->assign([
             'status' => 'error',
             'message' => $message,
+            'email' => $newEmail
 		]);
         }
         return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));

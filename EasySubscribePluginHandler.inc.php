@@ -17,7 +17,7 @@ class EasySubscribePluginHandler extends Handler {
 		
         if ($this->captchaEnabled) {
 			$publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-			$reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
+			$reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '" required></div>';
 			$templateMgr->assign(array(
 				'reCaptchaHtml' => $reCaptchaHtml,
 				'captchaEnabled' => true,
@@ -55,7 +55,7 @@ class EasySubscribePluginHandler extends Handler {
             if(!$responseData->success) {
                 if ($this->captchaEnabled) {
                     $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-                    $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
+                    $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '" required></div>';
                     $templateMgr->assign(array(
                         'reCaptchaHtml' => $reCaptchaHtml,
                         'captchaEnabled' => true,

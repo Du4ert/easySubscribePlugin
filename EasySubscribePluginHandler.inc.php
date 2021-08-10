@@ -67,6 +67,7 @@ class EasySubscribePluginHandler extends Handler {
                 $templateMgr->assign([
                     'status' => 'error',
                     'message' => $message,
+                    'email' => $newEmail
                 ]);
                 return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
             }
@@ -81,7 +82,8 @@ class EasySubscribePluginHandler extends Handler {
             $message = __('plugins.generic.easySubscribe.form.success');
             $templateMgr->assign([
                 'status' => 'success',
-                'message' => $message
+                'message' => $message,
+                'email' => $newEmail
             ]);
         } 
         else {

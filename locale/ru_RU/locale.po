@@ -18,10 +18,13 @@ msgid "plugins.generic.easySubscribe.description"
 msgstr "Подписка на объявления, рассылку уведомлений читателям и публикацию выпусков."
 
 msgid "plugins.generic.easySubscribe.page.subscribe"
-msgstr "Подписаться"
+msgstr "Уведомления"
 
 msgid "plugins.generic.easySubscribe.page.subscribe.title"
 msgstr "Подписаться на рассылку"
+
+msgid "plugins.generic.easySubscribe.page.description"
+msgstr "Введите свой электронный адрес, чтобы получать уведомления о новостях журнала."
 
 msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
 msgstr "Отписаться"
@@ -29,18 +32,29 @@ msgstr "Отписаться"
 msgid "plugins.generic.easySubscribe.breadcrumbs"
 msgstr "Подписка"
 
+msgid "plugins.generic.easySubscribe.page.email"
+msgstr "Адрес (E-mail)"
+
+msgid "plugins.generic.easySubscribe.page.email.confirm"
+msgstr "Подтвердите адрес E-mail"
 
 msgid "plugins.generic.easySubscribe.page.email.placeholder"
-msgstr "Введите email"
+msgstr "Введите e-mail"
+
+msgid "plugins.generic.easySubscribe.page.email.confirm.placeholder"
+msgstr "Подтвердите e-mail"
 
 msgid "plugins.generic.easySubscribe.form.error.exists"
-msgstr "Этот email адрес уже используется для подписки"
+msgstr "Этот e-mail адрес уже используется получения уведомлений"
 
 msgid "plugins.generic.easySubscribe.form.error.empty"
 msgstr "Заполните поле"
 
 msgid "plugins.generic.easySubscribe.form.error.wrong"
-msgstr "Неправильный email"
+msgstr "Неправильный e-mail"
+
+msgid "plugins.generic.easySubscribe.page.register.confirm.error"
+msgstr "E-mail не совпадают"
 
 msgid "plugins.generic.easySubscribe.form.captcha"
 msgstr "Captcha error"
@@ -58,4 +72,4 @@ msgid "plugins.generic.easySubscribe.unsubscribe.success"
 msgstr "Вы успешно отписались на рассылки. Возвращайтесь ("
 
 msgid "plugins.generic.easySubscribe.unsubscribe.error"
-msgstr "Неправильный email или id"
+msgstr "Неправильный e-mail или id"

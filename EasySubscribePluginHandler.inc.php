@@ -31,6 +31,7 @@ class EasySubscribePluginHandler extends Handler {
     public function register($args, $request) {
         $templateMgr = TemplateManager::getManager($request);
         $newEmail = $request->getUserVar('email');
+        $confirmEmail = $request->getUserVar('email_confirm');
         $csrfToken = $request->getUserVar('csrfToken');
         $recaptcha = $request->getUserVar('g-recaptcha-response');
         
@@ -72,7 +73,16 @@ class EasySubscribePluginHandler extends Handler {
                 return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
             }
          }
-
+        
+        if ($newEmail !== $confirmEmail) {
+            $message = __('plugins.generic.easySubscribe.page.register.confirm.error');
+            $templateMgr->assign([
+                'status' => 'error',
+                'message' => $message,
+                'email' => $newEmail
+            ]);
+            return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
+        } 
 
         if (!$easyEmailDao->getByEmail($this->contextId, $newEmail) && !!$newEmail) {
             $easyEmail = $easyEmailDao->newDataObject();

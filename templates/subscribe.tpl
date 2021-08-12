@@ -24,6 +24,11 @@
      {/if}
 
      {if $status !== 'success'}
+        
+     <div class="subscribe-description">
+        <p>{translate key="plugins.generic.easySubscribe.page.description"}</p>
+    </div>
+
         <form class="pkp_form register" id="register" method="post" action="{url op="register"}">
         {csrf}
     
@@ -38,10 +43,19 @@
         
         <div class="form-group email">
         <label>
-            {translate key="user.email"}
+            {translate key="plugins.generic.easySubscribe.page.email"}
             <span class="form-control-required">*</span>
             <span class="sr-only">{translate key="common.required"}</span>
             <input class="form-control" type="email" name="email" id="email" value="{$email|escape}" placeholder="{translate key='plugins.generic.easySubscribe.page.email.placeholder'}" maxlength="90" required>
+        </label>
+        </div>
+
+        <div class="form-group email">
+        <label>
+            {translate key="plugins.generic.easySubscribe.page.email.confirm"}
+            <span class="form-control-required">*</span>
+            <span class="sr-only">{translate key="common.required"}</span>
+            <input class="form-control" type="email" name="email_confirm" id="email_confirm" value="" placeholder="{translate key='plugins.generic.easySubscribe.page.email.confirm.placeholder'}" maxlength="90" required>
         </label>
         </div>
     

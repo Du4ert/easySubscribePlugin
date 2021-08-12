@@ -26,6 +26,8 @@ msgstr "Subscribe"
 msgid "plugins.generic.easySubscribe.page.subscribe.title"
 msgstr "Subscribe to email send"
 
+msgid "plugins.generic.easySubscribe.page.description"
+msgstr "Enter your email address to receive immediate notifications of important new content added to the journal."
 
 msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
 msgstr "Unsubscribe"
@@ -33,8 +35,17 @@ msgstr "Unsubscribe"
 msgid "plugins.generic.easySubscribe.breadcrumbs"
 msgstr "Subscription"
 
+msgid "plugins.generic.easySubscribe.page.email"
+msgstr "Email"
+
+msgid "plugins.generic.easySubscribe.page.email.confirm"
+msgstr "Confirm email"
+
 msgid "plugins.generic.easySubscribe.page.email.placeholder"
 msgstr "Enter your email"
+
+msgid "plugins.generic.easySubscribe.page.email.confirm.placeholder"
+msgstr "Confirm your email"
 
 msgid "plugins.generic.easySubscribe.form.error.exists"
 msgstr "This email address already exists"
@@ -44,6 +55,9 @@ msgstr "Email field empty"
 
 msgid "plugins.generic.easySubscribe.form.error.wrong"
 msgstr "Wrong email address"
+
+msgid "plugins.generic.easySubscribe.page.register.confirm.error"
+msgstr "E-mails do not match"
 
 msgid "plugins.generic.easySubscribe.form.button"
 msgstr "Apply email"

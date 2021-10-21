@@ -69,7 +69,7 @@ msgid "plugins.generic.easySubscribe.form.success"
 msgstr "Вы успешно подписались на рассылку. Спасибо."
 
 msgid "plugins.generic.easySubscribe.unsubscribe.success"
-msgstr "Вы успешно отписались на рассылки. Возвращайтесь ("
+msgstr "Вы успешно отписались от рассылки. Возвращайтесь ("
 
 msgid "plugins.generic.easySubscribe.unsubscribe.error"
 msgstr "Неправильный e-mail или id"

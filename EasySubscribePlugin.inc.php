@@ -87,15 +87,6 @@ class EasySubscribePlugin extends GenericPlugin
 		return 'Easy subscribe description*';
 	}
 
-	/**
-	 * Enable the settings form in the site-wide plugins list
-	 *
-	 * @return string
-	 */
-	public function isSitePlugin()
-	{
-		return true;
-	}
 
 	/**
 	 * Add a settings action to the plugin's entry in the

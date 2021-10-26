@@ -69,7 +69,19 @@ msgid "plugins.generic.easySubscribe.form.captcha"
 msgstr "Captcha error"
 
 msgid "plugins.generic.easySubscribe.form.success"
-msgstr "Success"
+msgstr "A notification has been sent to your mailbox. To activate your subscription, follow the link in the letter."
+
+msgid "plugins.generic.easySubscribe.activate"
+msgstr "Activate"
+
+msgid "plugins.generic.easySubscribe.activate.title"
+msgstr "E-mail notification activation"
+
+msgid "plugins.generic.easySubscribe.activate.success"
+msgstr "Success. Your e-mail subscription activated."
+
+msgid "plugins.generic.easySubscribe.activate.error"
+msgstr "Wrong email address or id."
 
 msgid "plugins.generic.easySubscribe.unsubscribe.success"
 msgstr "Success"
@@ -77,3 +89,40 @@ msgstr "Success"
 msgid "plugins.generic.easySubscribe.unsubscribe.error"
 msgstr "Wrong email address or id"
 
+
+
+msgid "plugins.generic.easySubscribe.letter.header"
+msgstr "This is an automatic notification from the site"
+
+msgid "plugins.generic.easySubscribe.letter.unsubscribe.title"
+msgstr "unsubscribe"
+
+msgid "plugins.generic.easySubscribe.letter.unsubscribe.text"
+msgstr "To unsubscribe from the newsletter, follow the link:"
+
+msgid "plugins.generic.easySubscribe.letter.register.subject"
+msgstr "Registered notification subscription"
+
+msgid "plugins.generic.easySubscribe.letter.register.text"
+msgstr "You received this notification because your mailbox was registered on the site"
+
+msgid "plugins.generic.easySubscribe.letter.activate.title"
+msgstr "activate"
+
+msgid "plugins.generic.easySubscribe.letter.activate.text"
+msgstr "To activate your subscription, follow the link"
+
+msgid "plugins.generic.easySubscribe.letter.issue.title"
+msgstr "New issue published:"
+
+msgid "plugins.generic.easySubscribe.letter.issue.link"
+msgstr "Available from the link:"
+
+msgid "plugins.generic.easySubscribe.letter.announcement.subject"
+msgstr "New notification from the site"
+
+msgid "plugins.generic.easySubscribe.letter.announcement.title"
+msgstr "New announcement:"
+
+msgid "plugins.generic.easySubscribe.letter.announcement.link"
+msgstr "More details on the link:"

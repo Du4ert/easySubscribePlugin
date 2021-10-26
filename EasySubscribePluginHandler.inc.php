@@ -56,6 +56,8 @@ class EasySubscribePluginHandler extends Handler {
             $secret = Config::getVar('captcha', 'recaptcha_private_key');
             $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$recaptcha);
             $responseData = json_decode($verifyResponse);
+
+            // ! Каптча игнорируется
             if(!!$responseData->success) {
                 $status = 'error';
                 if ($this->captchaEnabled) {
@@ -85,6 +87,7 @@ class EasySubscribePluginHandler extends Handler {
             $easyEmail = $easyEmailDao->newDataObject();
             $easyEmail->setEmail((string) $newEmail, null);
             $easyEmail->setContextId((int) $this->contextId);
+            $easyEmail->setActive((int) 0);
             $easyEmailDao->insertObject($easyEmail);
             $message[] = __('plugins.generic.easySubscribe.form.success');
             $this->subscribeNotification($easyEmail);
@@ -101,6 +104,37 @@ class EasySubscribePluginHandler extends Handler {
         ]);
 
         return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
+    }
+
+
+    public function activate($args, $request) {
+        $templateMgr = TemplateManager::getManager($request);
+        $email = $request->getUserVar('email');
+        $id = $request->getUserVar('id');
+        
+        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+        $message = '';
+
+        $easyEmail = $easyEmailDao->getById($this->contextId, $id);
+
+        if ($easyEmail && $easyEmail->getEmail() === $email) {
+            $easyEmailDao->activate($this->contextId, $easyEmail);
+
+            $message = __('plugins.generic.easySubscribe.activate.success');
+
+            $templateMgr->assign([
+                'status' => 'success',
+                'message' => $message,
+            ]);
+        } 
+        else {
+        $message = __('plugins.generic.easySubscribe.activate.error');
+        $templateMgr->assign([
+            'status' => 'error',
+            'message' => $message,
+		]);
+        }
+        return $templateMgr->display($this->plugin->getTemplateResource('activate.tpl'));
     }
 
     public function unsubscribe($args, $request) {
@@ -133,38 +167,44 @@ class EasySubscribePluginHandler extends Handler {
         return $templateMgr->display($this->plugin->getTemplateResource('unsubscribe.tpl'));
     }
 
-    //! Функционал для тестирования. Нужно перенести в админ панель
-    public function list($args, $request) {
-        $templateMgr = TemplateManager::getManager($request);
-        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-        $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
-
-        $templateMgr->assign([
-            'emailsList' => $emailsList,
-        ]);
-    
-
-        return $templateMgr->display($this->plugin->getTemplateResource('list.tpl'));
-    }
 
 
     protected function subscribeNotification($email) {
         import('lib.pkp.classes.mail.Mail');
         $request = Application::get()->getRequest();
         $context = $request->getContext();
+        $siteName = $context->getName('ru_RU');
+        $basePath = $request->getBaseUrl();
 
 		$fromEmail = $context->getData('contactEmail');
 		$fromName = $context->getData('contactName');
-		$headerTemplate= '<small>Это автоматическое уведомление с сайта ' . $context->getName('ru_RU') . '.</small>';
-		$footerTemplate = '<small>Чтобы отписаться от рассылки, перейдите по ссылке: <a href="URL">URL</a></small>';
-        $unsubscribeUrl = $request->getBaseUrl() . '/' . $context->getPath() . '/easysubscribe/unsubscribe';
+        $unsubscribeUrl = $basePath . '/' . $context->getPath() . '/easysubscribe/unsubscribe' . '?email=' . $email->getData('email') . '&id=' . $email->getId();
+        $activateUrl = $basePath. '/' . $context->getPath() . '/easysubscribe/activate'  . '?email=' . $email->getData('email') . '&id=' . $email->getId();
 
-        $header = $headerTemplate;
-        $footer = str_replace('URL', $unsubscribeUrl . '?email=' . $email->getData('email') . '&id=' . $email->getId(), $footerTemplate);
+		$header = "<small>" ;
+        $header .= __('plugins.generic.easySubscribe.letter.header');
+        $header .= $siteName;
+        $header .= "</small>";
 
-        $subject = 'Зарегестрирована подписка на уведомления';
-        $body = "<p>Вы получили это уведомление, потому что ваш почтовый ящик был зарегестрирован на сайте <a href=". $request->getBaseUrl() ." >".
-                $context->getName('ru_RU') . "</a></p><p>Если это были не вы, или вы передумали, перейдите по ссылке ниже.</p>";
+        $footer = "<small>";
+        $footer .= __('plugins.generic.easySubscribe.letter.unsubscribe.text');
+        $footer .= " <a href=\"$unsubscribeUrl\">";
+        $footer .= __('plugins.generic.easySubscribe.letter.unsubscribe.title');
+        $footer .= "</a></small>";
+
+
+        $subject = __('plugins.generic.easySubscribe.letter.register.subject');
+
+        $body = "";
+        $body .= "<p>";
+        $body .= __('plugins.generic.easySubscribe.letter.register.text');
+        $body .= " <a href=\"$basePath\">$siteName</a></p>" ;
+
+        $body .= "<p>";
+        $body .= __("plugins.generic.easySubscribe.letter.activate.text");
+        $body .= " <a href=\"$activateUrl\">";
+        $body .= __('plugins.generic.easySubscribe.letter.activate.title');
+        $body .= "</a></p>";
 
         $mail = new Mail();
         $mail->setFrom($fromEmail, $fromName);
@@ -178,5 +218,21 @@ class EasySubscribePluginHandler extends Handler {
         $mail->setBody($body . "<p>$header <br/> $footer</p>");
         $mail->send();
     }
+
+
+        //! Функционал для тестирования. Нужно перенести в админ панель
+        public function list($args, $request) {
+            $templateMgr = TemplateManager::getManager($request);
+            $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+            $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
+    
+            $templateMgr->assign([
+                'emailsList' => $emailsList,
+            ]);
+        
+    
+            return $templateMgr->display($this->plugin->getTemplateResource('list.tpl'));
+        }
+    
 
 }

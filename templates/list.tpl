@@ -19,13 +19,15 @@
              <tr>
                  <td>Id</td>
                  <td>Email</td>
+                 <td>Active</td>
                  <td>Delete</td>
              </tr>
          </thead>
     {foreach from=$emailsList item=email}
             <tr>
             <td>{$email->getId()}</td>
-            <td>{$email->getData('email')}</td>
+            <td>{$email->getEmail()}</td>
+            <td>{$email->getActive()}</td>
             <td><a href="/jour/easysubscribe/unsubscribe?email={$email->getData('email')}&id={$email->getId()}">Удалить</a></td>
             </tr>
     {/foreach}

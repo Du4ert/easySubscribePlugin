@@ -23,7 +23,7 @@ class EasyEmail extends DataObject {
 	 * @return string
 	 */
 	function getContextId(){
-		return $this->getData('contextId');
+		return $this->getData('context_id');
 	}
 
 	/**
@@ -31,7 +31,7 @@ class EasyEmail extends DataObject {
 	 * @param $contextId int
 	 */
 	function setContextId($contextId) {
-		return $this->setData('contextId', $contextId);
+		return $this->setData('context_id', $contextId);
 	}
 
 
@@ -52,5 +52,22 @@ class EasyEmail extends DataObject {
 	function getEmail() {
 		return $this->getData('email');
 	}
-}
 
+	/**
+	 * Get subscriber Email active
+	 * @param locale
+	 * @return string
+	 */
+	function getActive() {
+		return $this->getData('active');
+	}
+
+	/**
+	 * Set subscriber Email active
+	 * @param locale
+	 * @return string
+	 */
+	function setActive($status) {
+		return $this->setData('active', $status);
+}
+}

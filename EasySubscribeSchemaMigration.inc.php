@@ -27,6 +27,7 @@ class EasySubscribeSchemaMigration extends Migration {
 			$table->bigInteger('easysubscribe_email_id')->autoIncrement();
 			$table->string('email', 255);
 			$table->bigInteger('context_id');
+			$table->tinyInteger('active');
 		});
 	}
 	public function check() {

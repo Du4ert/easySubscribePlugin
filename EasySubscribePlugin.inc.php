@@ -188,15 +188,19 @@ class EasySubscribePlugin extends GenericPlugin
 		$request = Application::get()->getRequest();
 		$context = $request->getContext();
 
-		$subject = 'Новое уведомление с сайта ' . $context->getName('ru_RU');
+		$subject = __('plugins.generic.easySubscribe.letter.announcement.subject') . $context->getName('ru_RU');
 		$body = '';
 		$title = $announcement->getTitle('ru_RU');
 		$descriptionShort = $announcement->getDescriptionShort('ru_RU');
 		$url = $request->getBaseUrl() . '/' . $context->getPath() . '/announcement/view/' . $announcement->getData('id');
 
-		$body .= "<p>Новое объявление: $title</p>";
-		$body .= "<p>$descriptionShort</p>";
-		$body .= 'Подробнее по ссылке: <a href="' . $url . '">' . $url . '</a>';
+		$body .= "<p>";
+		$body .= __('plugins.generic.easySubscribe.letter.announcement.title') . ' ';
+		$body .= $title;
+		$body .= "</p>";
+		$body .= "<p>$descriptionShort</p><p>";
+		$body .= __('plugins.generic.easySubscribe.letter.announcement.link') . ' ';
+		$body .= '<a href="' . $url . '">' . $url . '</a></p>';
 
 		$this->sendToSubscribers($subject, $body, $context);
 
@@ -235,18 +239,22 @@ class EasySubscribePlugin extends GenericPlugin
 			if (in_array($issueUrl, EasySubscribePlugin::ISSUE_IGNORE_LIST)) {
 				return false;
 			}
-
+			
+			$siteName = $context->getName('ru_RU');
+			$issueTitle = $issue->getIssueIdentification([], 'ru_RU');
 			
 
 			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
 
-			$subject = 'Опубликован новый выпуск: ' . $context->getName('ru_RU');
+			$subject = __('plugins.generic.easySubscribe.letter.issue.title') . ' ' . $siteName;
 
-			$body = '<p>';
-			$body .= 'Опубликован новый выпуск: ' . $issue->getIssueIdentification([], 'ru_RU');
-			$body .= '</p><p>';
-			$body .= "Доступен по ссылке: <a href='$url'>$url</a>";
-			$body .= '</p>';
+			$body = "<p>";
+			$body .= __('plugins.generic.easySubscribe.letter.issue.title') . " ";
+			$body .= $issueTitle;
+			$body .= "</p><p>";
+			$body .= __('plugins.generic.easySubscribe.letter.issue.link');
+			$body .= " <a href='$url'>$url</a>";
+			$body .= "</p>";
 
 
 			$this->sendToSubscribers($subject, $body, $context);
@@ -264,25 +272,35 @@ class EasySubscribePlugin extends GenericPlugin
 		import('lib.pkp.classes.mail.Mail');
 		$fromEmail = $context->getData('contactEmail');
 		$fromName = $context->getData('contactName');
-		$headerTemplate= '<small>Это автоматическое уведомление с сайта ' . $context->getName('ru_RU') . '.</small>';
-		$footerTemplate = '<small>Чтобы отписаться от рассылки, перейдите по ссылке: <a href="URL">URL</a></small>';
+		$siteName = $context->getName('ru_RU');
+        $basePath = $request->getBaseUrl();
 
-
-		$unsubscribeUrl = $request->getBaseUrl() . '/' . $context->getPath() . '/easysubscribe/unsubscribe';
+		$fromEmail = $context->getData('contactEmail');
+		$fromName = $context->getData('contactName');
 
 		$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-		$emailsList = $easyEmailDao->getByContextId($context->getId())->toArray();
+		$emailsList = $easyEmailDao->getActiveByContextId($context->getId())->toArray();
 
 		foreach ($emailsList as $email) {
-			$header = $headerTemplate;
-			$footer = str_replace('URL', $unsubscribeUrl . '?email=' . $email->getData('email') . '&id=' . $email->getId(), $footerTemplate);
+			$unsubscribeUrl = $basePath . '/' . $context->getPath() . '/easysubscribe/unsubscribe' . '?email=' . $email->getEmail() . '&id=' . $email->getId();
+			
+			$header = "<small>" ;
+			$header .= __('plugins.generic.easySubscribe.letter.header') . " ";
+			$header .= $siteName;
+			$header .= "</small>";
+			
+			$footer = "<small>";
+			$footer .= __('plugins.generic.easySubscribe.letter.unsubscribe.text');
+			$footer .= " <a href=\"$unsubscribeUrl\">";
+			$footer .= __('plugins.generic.easySubscribe.letter.unsubscribe.title');
+			$footer .= "</a></small>";
 
 			$mail = new Mail();
 			$mail->setFrom($fromEmail, $fromName);
 			$mail->setRecipients([
 				[
 					'name' => '',
-					'email' => $email->getData('email'),
+					'email' => $email->getEmail(),
 				],
 			]);
 			$mail->setSubject($subject);

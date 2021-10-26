@@ -66,10 +66,60 @@ msgid "plugins.generic.easySubscribe.page.register.error"
 msgstr "Пожалуйста используйте стандартную форму подписки:"
 
 msgid "plugins.generic.easySubscribe.form.success"
+msgstr "На ваш почтовый ящик выслано уведомление. Чтобы активировать подписку, перейдите по ссылке в письме."
+
+msgid "plugins.generic.easySubscribe.activate.success"
 msgstr "Вы успешно подписались на рассылку. Спасибо."
+
+msgid "plugins.generic.easySubscribe.activate"
+msgstr "Активировать"
+
+msgid "plugins.generic.easySubscribe.activate.title"
+msgstr "Активация подписки на уведомления"
+
+msgid "plugins.generic.easySubscribe.activate.error"
+msgstr "Неправильный e-mail или id."
 
 msgid "plugins.generic.easySubscribe.unsubscribe.success"
 msgstr "Вы успешно отписались от рассылки. Возвращайтесь ("
 
 msgid "plugins.generic.easySubscribe.unsubscribe.error"
-msgstr "Неправильный e-mail или id"
+msgstr "Неправильный e-mail или id."
+
+
+
+msgid "plugins.generic.easySubscribe.letter.header"
+msgstr "Это автоматическое уведомление с сайта"
+
+msgid "plugins.generic.easySubscribe.letter.unsubscribe.title"
+msgstr "отписаться"
+
+msgid "plugins.generic.easySubscribe.letter.unsubscribe.text"
+msgstr "Чтобы отписаться от рассылки, перейдите по ссылке:"
+
+msgid "plugins.generic.easySubscribe.letter.register.subject"
+msgstr "Зарегистрирована подписка на уведомления"
+
+msgid "plugins.generic.easySubscribe.letter.register.text"
+msgstr "Вы получили это уведомление, потому что ваш почтовый ящик был зарегистрирован на сайте"
+
+msgid "plugins.generic.easySubscribe.letter.activate.title"
+msgstr "активировать"
+
+msgid "plugins.generic.easySubscribe.letter.activate.text"
+msgstr "Чтобы активировать подписку, перейдите по ссылке"
+
+msgid "plugins.generic.easySubscribe.letter.issue.title"
+msgstr "Опубликован новый выпуск:"
+
+msgid "plugins.generic.easySubscribe.letter.issue.link"
+msgstr "Доступен по ссылке:"
+
+msgid "plugins.generic.easySubscribe.letter.announcement.subject"
+msgstr "Новое уведомление с сайта"
+
+msgid "plugins.generic.easySubscribe.letter.announcement.title"
+msgstr "Новое объявление:"
+
+msgid "plugins.generic.easySubscribe.letter.announcement.link"
+msgstr "Подробнее по ссылке:"

@@ -50,6 +50,21 @@ class EasyEmailDAO extends DAO {
 		return new DAOResultFactory($result, $this, '_fromRow');
 	}
 
+		/**
+	 * Get a set of easy email by context ID
+	 * @param $contextId int
+	 * @param $rangeInfo Object optional
+	 * @return DAOResultFactory
+	 */
+	function getActiveByContextId($contextId, $rangeInfo = null) {
+		$result = $this->retrieveRange(
+			'SELECT * FROM easysubscribe_emails WHERE context_id = ? AND active = 1',
+			[(int) $contextId],
+			$rangeInfo
+		);
+		return new DAOResultFactory($result, $this, '_fromRow');
+	}
+
 	/**
 	 * Get a email by email address.
 	 * @param $contextId int Context ID
@@ -73,8 +88,8 @@ class EasyEmailDAO extends DAO {
 	 */
 	function insertObject($easyEmail) {
 		$this->update(
-			'INSERT INTO easysubscribe_emails (context_id, email) VALUES (?, ?)',
-			[(int) $easyEmail->getContextId(), $easyEmail->getEmail()]
+			'INSERT INTO easysubscribe_emails (context_id, email, active) VALUES (?, ?, ?)',
+			[(int) $easyEmail->getContextId(), $easyEmail->getEmail(), 0]
 		);
 
 		$easyEmail->setId($this->getInsertId());
@@ -89,14 +104,35 @@ class EasyEmailDAO extends DAO {
 	function updateObject($easyEmail) {
 		$this->update(
 			'UPDATE	easysubscribe_emails
-			SET	context_id = ?
-			WHERE	easysubscribe_email_id = ?',
+			SET	email = ?, active = ?
+			WHERE	easysubscribe_email_id = ? AND context_id = ?',
 			[
-				(int) $easyEmail->getContextId(),
 				$easyEmail->getEmail(),
-				(int) $easyEmail->getId()
+				(int) $easyEmail->getActive(),
+				(int) $easyEmail->getId(),
+				(int) $easyEmail->getContextId()
 			]
 		);
+	}
+
+	/**
+	 * Update active status to 1
+	 * @param $contextId INT $easyEmail EasyEmail
+	 */
+	function activate($contextId, $easyEmail) {
+		$easyEmail->setActive(1);
+		$easyEmail->setContextId($contextId);
+		$this->updateObject($easyEmail);
+	}
+
+	/**
+	 * Update active status to 0
+	 * @param $contextId INT $easyEmail EasyEmail
+	 */
+	function deactivate($contextId, $easyEmail) {
+		$easyEmail->setActive(0);
+		$easyEmail->setContextId($contextId);
+		$this->updateObject($easyEmail);
 	}
 
 	/**
@@ -134,6 +170,7 @@ class EasyEmailDAO extends DAO {
 		$easyEmail = $this->newDataObject();
 		$easyEmail->setId($row['easysubscribe_email_id']);
 		$easyEmail->setEmail($row['email']);
+		$easyEmail->setActive($row['active']);
 
 		return $easyEmail;
 	}

@@ -24,9 +24,10 @@ class EasySubscribeSchemaMigration extends Migration {
         public function up() {
 		// List of emails for easy subscribe
 		Capsule::schema()->create('easysubscribe_emails', function (Blueprint $table) {
+			$table->bigInteger('context_id');
 			$table->bigInteger('easysubscribe_email_id')->autoIncrement();
 			$table->string('email', 255);
-			$table->bigInteger('context_id');
+			$table->string('locale', 255);
 			$table->tinyInteger('active');
 		});
 	}

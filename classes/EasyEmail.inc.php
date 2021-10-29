@@ -1,14 +1,10 @@
 <?php
 
 /**
- * @file classes/EasayEmail.inc.php
+ * @file classes/EasyEmail.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
- *
- * @package plugins.generic.EasayEmails
- * @class EasayEmail
+ * @package plugins.generic.EasyEmails
+ * @class EasyEmail
  * Data object representing a static page.
  */
 
@@ -69,5 +65,23 @@ class EasyEmail extends DataObject {
 	 */
 	function setActive($status) {
 		return $this->setData('active', $status);
+}
+
+	/**
+	 * Get subscriber prefered locale
+	 * @param locale
+	 * @return string
+	 */
+	function getLocale() {
+		return $this->getData('locale');
+	}
+
+	/**
+	 * Set subscriber prefered locale
+	 * @param locale
+	 * @return string
+	 */
+	function setLocale($locale) {
+		return $this->setData('locale', $locale);
 }
 }

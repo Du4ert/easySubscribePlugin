@@ -44,6 +44,9 @@ msgstr "Введите e-mail"
 msgid "plugins.generic.easySubscribe.page.email.confirm.placeholder"
 msgstr "Подтвердите e-mail"
 
+msgid "plugins.generic.easySubscribe.page.locale"
+msgstr "Выберите язык, на котором хотите получать уведомления"
+
 msgid "plugins.generic.easySubscribe.form.error.exists"
 msgstr "Этот e-mail адрес уже используется получения уведомлений"
 
@@ -116,10 +119,16 @@ msgid "plugins.generic.easySubscribe.letter.issue.link"
 msgstr "Доступен по ссылке:"
 
 msgid "plugins.generic.easySubscribe.letter.announcement.subject"
-msgstr "Новое уведомление с сайта"
+msgstr "Новое объявление на сайте"
 
 msgid "plugins.generic.easySubscribe.letter.announcement.title"
 msgstr "Новое объявление:"
 
 msgid "plugins.generic.easySubscribe.letter.announcement.link"
 msgstr "Подробнее по ссылке:"
+
+msgid "plugins.generic.easySubscribe.letter.subject"
+msgstr "Новое уведомление с сайта"
+
+msgid "plugins.generic.easySubscribe.page.list.title"
+msgstr "Список подписавшихся"

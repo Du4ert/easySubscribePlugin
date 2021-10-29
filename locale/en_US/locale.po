@@ -47,6 +47,10 @@ msgstr "Enter your email"
 msgid "plugins.generic.easySubscribe.page.email.confirm.placeholder"
 msgstr "Confirm your email"
 
+msgid "plugins.generic.easySubscribe.page.locale"
+msgstr "Select the language in which you want to receive notifications"
+
+
 msgid "plugins.generic.easySubscribe.form.error.exists"
 msgstr "This email address already exists"
 
@@ -119,10 +123,16 @@ msgid "plugins.generic.easySubscribe.letter.issue.link"
 msgstr "Available from the link:"
 
 msgid "plugins.generic.easySubscribe.letter.announcement.subject"
-msgstr "New notification from the site"
+msgstr "New announcement on the site"
 
 msgid "plugins.generic.easySubscribe.letter.announcement.title"
 msgstr "New announcement:"
 
 msgid "plugins.generic.easySubscribe.letter.announcement.link"
 msgstr "More details on the link:"
+
+msgid "plugins.generic.easySubscribe.letter.subject"
+msgstr "New notification from the site"
+
+msgid "plugins.generic.easySubscribe.page.list.title"
+msgstr "List of the subscribers"

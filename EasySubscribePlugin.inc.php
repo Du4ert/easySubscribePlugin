@@ -24,7 +24,8 @@ class EasySubscribePlugin extends GenericPlugin
 		if ($success && $this->getEnabled()) {
 			// Register the static pages DAO.
 			HookRegistry::register('PluginRegistry::loadCategory', [$this, 'updateSchema']);
-			import('plugins.generic.easySubscribe.classes.EasyEmailDAO');
+			// import('plugins.generic.easySubscribe.classes.EasyEmailDAO');
+			$this->import('classes/EasyEmailDAO');
 			$easyEmailDao = new EasyEmailDAO();
 			DAORegistry::registerDAO('EasyEmailDAO', $easyEmailDao);
 			$this->import('EasySubscribeBlockPlugin');
@@ -174,35 +175,88 @@ class EasySubscribePlugin extends GenericPlugin
 		return parent::manage($args, $request);
 	}
 
+	public function easyTranslate($key, $locale) {
+		if ($locale === AppLocale::getLocale()) {
+			return __($key);
+		} else {
+			$easyTranslation = new LocaleFile($locale, $this->getPluginPath() . '/locale/' . $locale . '/locale.po');
+			return $easyTranslation->translate($key);
+		}
+	}
+
+	
+	public function sendToSubscriber($body, $email, $request)
+	{
+		$context = $request->getContext();
+
+		import('lib.pkp.classes.mail.Mail');
+		$locale = $email->getLocale();
+		$siteName = $context->getName($locale);
+        $basePath = $request->getBaseUrl();
+		$fromEmail = $context->getData('contactEmail');
+		$fromName = $context->getData('contactName', $locale);
+		$unsubscribeUrl = $basePath . '/' . $context->getPath() . '/easysubscribe/unsubscribe' . '?email=' . $email->getEmail() . '&id=' . $email->getId();
+
+		$subject = $this->easyTranslate('plugins.generic.easySubscribe.letter.subject', $locale) . " " . $context->getName($locale);
+
+		
+		$header = "<small>" ;
+		$header .= $this->easyTranslate('plugins.generic.easySubscribe.letter.header', $locale) . " ";
+		$header .= $siteName;
+		$header .= "</small>";
+		
+		$footer = "<small>";
+		$footer .= $this->easyTranslate('plugins.generic.easySubscribe.letter.unsubscribe.text', $locale);
+		$footer .= " <a href=\"$unsubscribeUrl\">";
+		$footer .= $this->easyTranslate('plugins.generic.easySubscribe.letter.unsubscribe.title', $locale);
+		$footer .= "</a></small>";
+
+		$mail = new Mail();
+		$mail->setFrom($fromEmail, $fromName);
+		$mail->setRecipients([
+			[
+				'name' => '',
+				'email' => $email->getEmail(),
+			],
+		]);
+		$mail->setSubject($subject);
+		$mail->setBody($body . "<p>$header <br/> $footer</p>");
+		$mail->send();
+
+		return true;
+	}
+
 
 	public function announcementAddCallback($hookName, $params)
 	{
 		$announcement = $params[0];
 
-		$sendEmail = $announcement->getData('sendEmail');
-
-		if (!$sendEmail) {
+		if (!$announcement->getData('sendEmail')) {
 			return false;
 		}
 
 		$request = Application::get()->getRequest();
 		$context = $request->getContext();
 
-		$subject = __('plugins.generic.easySubscribe.letter.announcement.subject') . $context->getName('ru_RU');
-		$body = '';
-		$title = $announcement->getTitle('ru_RU');
-		$descriptionShort = $announcement->getDescriptionShort('ru_RU');
-		$url = $request->getBaseUrl() . '/' . $context->getPath() . '/announcement/view/' . $announcement->getData('id');
+		$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+		$emailsList = $easyEmailDao->getActiveByContextId($context->getId())->toArray();
 
-		$body .= "<p>";
-		$body .= __('plugins.generic.easySubscribe.letter.announcement.title') . ' ';
-		$body .= $title;
-		$body .= "</p>";
-		$body .= "<p>$descriptionShort</p><p>";
-		$body .= __('plugins.generic.easySubscribe.letter.announcement.link') . ' ';
-		$body .= '<a href="' . $url . '">' . $url . '</a></p>';
+		foreach ($emailsList as $email) {
+			$locale = $email->getLocale();
+			$title = $announcement->getTitle($locale);
+			$descriptionShort = $announcement->getDescriptionShort($locale);
+			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/announcement/view/' . $announcement->getData('id');
+	
+			$body  = "<p>";
+			$body .= $this->easyTranslate('plugins.generic.easySubscribe.letter.announcement.title', $locale) . ' ';
+			$body .= $title;
+			$body .= "</p>";
+			$body .= "<p>$descriptionShort</p><p>";
+			$body .= $this->easyTranslate('plugins.generic.easySubscribe.letter.announcement.link', $locale) . ' ';
+			$body .= '<a href="' . $url . '">' . $url . '</a></p>';
 
-		$this->sendToSubscribers($subject, $body, $context);
+			$this->sendToSubscriber($body, $email, $request);
+		}
 
 		return true;
 	}
@@ -216,11 +270,23 @@ class EasySubscribePlugin extends GenericPlugin
 		if (get_class($handler) === 'PKPEmailHandler' && in_array($targetGroupId, $groupIds)) {
 			$request = Application::get()->getRequest();
 			$context = $request->getContext();
-			$subject = $_POST['subject'];
-			$body = $_POST['body'];
 
+			$body = "<p><strong>";
+			$body .= $_POST['subject'];
+			$body .= "</strong></p>";
+			$body .= "<p>";
+			$body .= $_POST['body'];
+			$body .= "</p>";
 
-			$this->sendToSubscribers($subject, $body, $context);
+			$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+			$emailsList = $easyEmailDao->getActiveByContextId($context->getId())->toArray();
+
+			foreach ($emailsList as $email) {
+				$locale = $email->getLocale();
+	
+				$this->sendToSubscriber($body, $email, $request);
+			}
+	
 			return true;
 		}
 
@@ -240,77 +306,31 @@ class EasySubscribePlugin extends GenericPlugin
 				return false;
 			}
 			
-			$siteName = $context->getName('ru_RU');
-			$issueTitle = $issue->getIssueIdentification([], 'ru_RU');
-			
+			$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+			$emailsList = $easyEmailDao->getActiveByContextId($context->getId())->toArray();
 
-			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
+			foreach ($emailsList as $email) {
+				$locale = $email->getLocale();
 
-			$subject = __('plugins.generic.easySubscribe.letter.issue.title') . ' ' . $siteName;
+				$siteName = $context->getName($locale);
+				$issueTitle = $issue->getIssueIdentification([], $locale);
+				$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
+		
+				$body = "<p>";
+				$body .= $this->easyTranslate('plugins.generic.easySubscribe.letter.issue.title', $locale) . " ";
+				$body .= $issueTitle;
+				$body .= "</p><p>";
+				$body .= $this->easyTranslate('plugins.generic.easySubscribe.letter.issue.link', $locale);
+				$body .= " <a href='$url'>$url</a>";
+				$body .= "</p>";
+	
+				$this->sendToSubscriber($body, $email, $request);
+			}
 
-			$body = "<p>";
-			$body .= __('plugins.generic.easySubscribe.letter.issue.title') . " ";
-			$body .= $issueTitle;
-			$body .= "</p><p>";
-			$body .= __('plugins.generic.easySubscribe.letter.issue.link');
-			$body .= " <a href='$url'>$url</a>";
-			$body .= "</p>";
-
-
-			$this->sendToSubscribers($subject, $body, $context);
 			return true;
 		}
 		return false;
 	}
-
-	public function sendToSubscribers($subject, $body, $context)
-	{
-		//!! Хорошо бы обойтись без request'а
-			$request = Application::get()->getRequest();
-		//!!
-
-		import('lib.pkp.classes.mail.Mail');
-		$fromEmail = $context->getData('contactEmail');
-		$fromName = $context->getData('contactName');
-		$siteName = $context->getName('ru_RU');
-        $basePath = $request->getBaseUrl();
-
-		$fromEmail = $context->getData('contactEmail');
-		$fromName = $context->getData('contactName');
-
-		$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-		$emailsList = $easyEmailDao->getActiveByContextId($context->getId())->toArray();
-
-		foreach ($emailsList as $email) {
-			$unsubscribeUrl = $basePath . '/' . $context->getPath() . '/easysubscribe/unsubscribe' . '?email=' . $email->getEmail() . '&id=' . $email->getId();
-			
-			$header = "<small>" ;
-			$header .= __('plugins.generic.easySubscribe.letter.header') . " ";
-			$header .= $siteName;
-			$header .= "</small>";
-			
-			$footer = "<small>";
-			$footer .= __('plugins.generic.easySubscribe.letter.unsubscribe.text');
-			$footer .= " <a href=\"$unsubscribeUrl\">";
-			$footer .= __('plugins.generic.easySubscribe.letter.unsubscribe.title');
-			$footer .= "</a></small>";
-
-			$mail = new Mail();
-			$mail->setFrom($fromEmail, $fromName);
-			$mail->setRecipients([
-				[
-					'name' => '',
-					'email' => $email->getEmail(),
-				],
-			]);
-			$mail->setSubject($subject);
-			$mail->setBody($body . "<p>$header <br/> $footer</p>");
-			$mail->send();
-		}
-
-		return $subject . $body;
-	}
-
 
 	/**
 	 * @copydoc Plugin::getInstallMigration()

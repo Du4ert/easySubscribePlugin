@@ -3,9 +3,6 @@
 /**
  * @file classes/EasyEmailDAO.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @package plugins.generic.EasyEmail
  * @class EasyEmailDAO
@@ -88,8 +85,8 @@ class EasyEmailDAO extends DAO {
 	 */
 	function insertObject($easyEmail) {
 		$this->update(
-			'INSERT INTO easysubscribe_emails (context_id, email, active) VALUES (?, ?, ?)',
-			[(int) $easyEmail->getContextId(), $easyEmail->getEmail(), 0]
+			'INSERT INTO easysubscribe_emails (context_id, email, locale, active) VALUES (?, ?, ?, ?)',
+			[(int) $easyEmail->getContextId(), $easyEmail->getEmail(), $easyEmail->getLocale(), 0]
 		);
 
 		$easyEmail->setId($this->getInsertId());
@@ -104,10 +101,11 @@ class EasyEmailDAO extends DAO {
 	function updateObject($easyEmail) {
 		$this->update(
 			'UPDATE	easysubscribe_emails
-			SET	email = ?, active = ?
+			SET	email = ?, locale = ?, active = ?
 			WHERE	easysubscribe_email_id = ? AND context_id = ?',
 			[
 				$easyEmail->getEmail(),
+				$easyEmail->getLocale(),
 				(int) $easyEmail->getActive(),
 				(int) $easyEmail->getId(),
 				(int) $easyEmail->getContextId()
@@ -170,6 +168,7 @@ class EasyEmailDAO extends DAO {
 		$easyEmail = $this->newDataObject();
 		$easyEmail->setId($row['easysubscribe_email_id']);
 		$easyEmail->setEmail($row['email']);
+		$easyEmail->setLocale($row['locale']);
 		$easyEmail->setActive($row['active']);
 
 		return $easyEmail;

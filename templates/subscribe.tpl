@@ -59,20 +59,23 @@
         </label>
         </div>
 
-        <div class="form-group radio">
+        <div class="form-group language">
             {translate key="plugins.generic.easySubscribe.page.locale"}
-            <div class="form-check form-check-inline">
-                <input type="radio" name="locale" id="language1" class="form-check-label" value="ru_RU" checked>
+            <div class="input-group">
+                <input type="radio" name="locale" id="language1" value="ru_RU" checked> 
                 <label for="language1"  class="form-check-label">Русский</label>
             </div>
-            <div class="form-check form-check-inline">
+            <div class="input-group">
                 <input type="radio" name="locale" id="language2" value="en_US">
                 <label for="language2"  class="form-check-label">English</label>
             </div>
         </div>
 
+        
     
         </fieldset>
+
+        
     
         {* recaptcha spam blocker *}
         {if $reCaptchaHtml}

@@ -68,6 +68,13 @@ class EasySubscribeSettingsForm extends Form {
 		$context = Application::get()->getRequest()->getContext();
 		$contextId = $context ? $context->getId() : CONTEXT_SITE;
 		$this->plugin->updateSetting($contextId, 'publicationStatement', $this->getData('publicationStatement'));
+		$templateMgr = TemplateManager::getManager($request);
+        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+        $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
+
+
+
+
 
 		// Tell the user that the save was successful.
 		import('classes.notification.NotificationManager');

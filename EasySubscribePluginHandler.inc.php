@@ -60,8 +60,8 @@ class EasySubscribePluginHandler extends Handler
             $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret . '&response=' . $recaptcha);
             $responseData = json_decode($verifyResponse);
 
-            // ! Каптча игнорируется
-            if (!!$responseData->success) {
+            // ! Каптча не игнорируется
+            if (!$responseData->success) {
                 $status = 'error';
                 if ($this->captchaEnabled) {
                     $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
@@ -201,6 +201,7 @@ class EasySubscribePluginHandler extends Handler
     //! Функционал для тестирования. Нужно перенести в админ панель
     public function list($args, $request)
     {
+        if (Validation::isLoggedIn()) {
         $templateMgr = TemplateManager::getManager($request);
         $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
         $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
@@ -211,5 +212,6 @@ class EasySubscribePluginHandler extends Handler
 
 
         return $templateMgr->display($this->plugin->getTemplateResource('list.tpl'));
+    }
     }
 }

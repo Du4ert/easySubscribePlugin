@@ -5,15 +5,13 @@ class EasySubscribePluginHandler extends Handler
     public $contextId;
     public $plugin;
     public $captchaEnabled;
-    public $hCaptcha;
 
     function __construct($request)
     {
         parent::__construct();
         $this->contextId = $request->getContext()->getId();
         $this->plugin = PluginRegistry::getPlugin('generic', 'easysubscribeplugin');
-        $this->captchaEnabled = Config::getVar('captcha', 'captcha_on_register') && Config::getVar('captcha', 'recaptcha') || Config::getVar('captcha', 'hcaptcha');
-        $this->hCaptcha = Config::getVar('captcha', 'hcaptcha');
+        $this->captchaEnabled = Config::getVar('captcha', 'captcha_on_register') && Config::getVar('captcha', 'recaptcha');
     }
 
     public function index($args, $request)
@@ -22,15 +20,12 @@ class EasySubscribePluginHandler extends Handler
 
         if ($this->captchaEnabled) {
             $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-            $siteKeyHCaptcha = Config::getVar('captcha', 'hcaptcha_site_key');
             $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
-            $hCaptchaHtml = '<div class="h-captcha" data-sitekey="' . $siteKeyHCaptcha . '"></div>';
             $templateMgr->assign(array(
-                'captchaHtml' => $this->hCaptcha ? $hCaptchaHtml : $reCaptchaHtml,
+                'reCaptchaHtml' => $reCaptchaHtml,
                 'captchaEnabled' => true,
             ));
-            $this->hCaptcha ? $templateMgr->addJavaScript('recaptcha', 'https://js.hcaptcha.com/1/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2)) 
-            : $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
+            $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
         }
         return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
     }
@@ -41,7 +36,7 @@ class EasySubscribePluginHandler extends Handler
         $newEmail = $request->getUserVar('email');
         $confirmEmail = $request->getUserVar('email_confirm');
         $csrfToken = $request->getUserVar('csrfToken');
-        $captchaResponse = $this->hCaptcha ? $request->getUserVar('h-captcha-response') : $request->getUserVar('g-recaptcha-response');
+        $recaptcha = $request->getUserVar('g-recaptcha-response');
         $locale = $request->getUserVar('locale');
 
         $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
@@ -59,24 +54,23 @@ class EasySubscribePluginHandler extends Handler
 
             return $templateMgr->display('frontend/pages/error.tpl');
         }
+
         if ($this->captchaEnabled) {
-            $secret = $this->hCaptcha ? Config::getVar('captcha', 'hcaptcha_secret_key') : Config::getVar('captcha', 'recaptcha_private_key');
-            $verifyResponse = file_get_contents($this->hCaptcha ? 'https://hcaptcha.com/' : 'https://www.google.com/recaptcha/api/' . 'siteverify?secret=' . $secret . '&response=' . $captchaResponse);
+            $secret = Config::getVar('captcha', 'recaptcha_private_key');
+            $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret . '&response=' . $recaptcha);
             $responseData = json_decode($verifyResponse);
-        
+
+            // ! Каптча не игнорируется
             if (!$responseData->success) {
                 $status = 'error';
                 if ($this->captchaEnabled) {
                     $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-                    $siteKeyHCaptcha = Config::getVar('captcha', 'hcaptcha_site_key');
                     $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
-                    $hCaptchaHtml = '<div class="h-captcha" data-sitekey="' . $siteKeyHCaptcha . '"></div>';
                     $templateMgr->assign(array(
-                        'captchaHtml' => $this->hCaptcha ? $hCaptchaHtml : $reCaptchaHtml,
+                        'reCaptchaHtml' => $reCaptchaHtml,
                         'captchaEnabled' => true,
                     ));
-                    $this->hCaptcha ? $templateMgr->addJavaScript('recaptcha', 'https://js.hcaptcha.com/1/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2)) 
-                    : $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
+                    $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
                 }
                 $message[] = __('plugins.generic.easySubscribe.form.captcha');
             }

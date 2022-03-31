@@ -78,11 +78,11 @@
         
     
         {* recaptcha spam blocker *}
-        {if $captchaHtml}
+        {if $reCaptchaHtml}
             <fieldset class="recaptcha_wrapper">
                 <div class="fields">
                     <div class="form-group recaptcha">
-                        {$captchaHtml}
+                        {$reCaptchaHtml}
                     </div>
                 </div>
             </fieldset>

@@ -5,6 +5,8 @@ class EasySubscribePluginHandler extends Handler
     public $contextId;
     public $plugin;
     public $captchaEnabled;
+    public $customCaptcha = true;
+    public $captchaVerified = false;
 
     function __construct($request)
     {
@@ -18,14 +20,25 @@ class EasySubscribePluginHandler extends Handler
     {
         $templateMgr = TemplateManager::getManager($request);
 
-        if ($this->captchaEnabled) {
-            $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-            $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
-            $templateMgr->assign(array(
-                'reCaptchaHtml' => $reCaptchaHtml,
-                'captchaEnabled' => true,
-            ));
-            $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
+        if ($this->captchaEnabled && !$this->captchaVerified) {
+            if ($this->customCaptcha) {
+
+                require_once('securimage/securimage.php');
+                $captchaHtml = Securimage::getCaptchaHtml();
+
+                $templateMgr->assign([
+                    'captchaHtml' => $captchaHtml,
+                    'captchaEnabled' => true
+                ]);
+            } else {
+                $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
+                $captchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
+                $templateMgr->assign(array(
+                    'captchaHtml' => $captchaHtml,
+                    'captchaEnabled' => true,
+                ));
+                $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
+            }
         }
         return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
     }
@@ -54,27 +67,43 @@ class EasySubscribePluginHandler extends Handler
 
             return $templateMgr->display('frontend/pages/error.tpl');
         }
-
-        if ($this->captchaEnabled) {
-            $secret = Config::getVar('captcha', 'recaptcha_private_key');
-            $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret . '&response=' . $recaptcha);
-            $responseData = json_decode($verifyResponse);
-
-            // ! Каптча не игнорируется
-            if (!$responseData->success) {
-                $status = 'error';
-                if ($this->captchaEnabled) {
-                    $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
-                    $reCaptchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
-                    $templateMgr->assign(array(
-                        'reCaptchaHtml' => $reCaptchaHtml,
-                        'captchaEnabled' => true,
-                    ));
-                    $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
+        
+        if ($this->captchaEnabled && !$this->captchaVerified) {
+            if ($this->customCaptcha) {
+                require_once('securimage/securimage.php');
+                $image = new Securimage();
+    
+                if ($image->check($_POST['captcha_code']) !== true) {
+                    $status = 'error';
+                    $message[] = __('plugins.generic.easySubscribe.form.captcha');
+                    $captchaHtml = Securimage::getCaptchaHtml();
+    
+                    $templateMgr->assign([
+                        'captchaHtml' => $captchaHtml,
+                        'captchaEnabled' => true
+                    ]);
                 }
-                $message[] = __('plugins.generic.easySubscribe.form.captcha');
-            }
+            } else {
+                $secret = Config::getVar('captcha', 'recaptcha_private_key');
+                $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret . '&response=' . $recaptcha);
+                $responseData = json_decode($verifyResponse);
+    
+                if (!$responseData->success) {
+                    $status = 'error';
+                    if ($this->captchaEnabled) {
+                        $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
+                        $captchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
+                        $templateMgr->assign(array(
+                            'captchaHtml' => $captchaHtml,
+                            'captchaEnabled' => true,
+                        ));
+                        $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
+                    }
+                    $message[] = __('plugins.generic.easySubscribe.form.captcha');
+                }
+            }    
         }
+
 
         if ($newEmail !== $confirmEmail) {
             $status = 'error';

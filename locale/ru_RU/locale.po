@@ -48,7 +48,7 @@ msgid "plugins.generic.easySubscribe.page.locale"
 msgstr "Выберите язык, на котором хотите получать уведомления"
 
 msgid "plugins.generic.easySubscribe.form.error.exists"
-msgstr "Этот e-mail адрес уже используется получения уведомлений"
+msgstr "Этот e-mail адрес уже используется для получения уведомлений"
 
 msgid "plugins.generic.easySubscribe.form.error.empty"
 msgstr "Заполните поле"

@@ -23,12 +23,13 @@
 	{csrf}
 
 	{fbvFormArea}
-		{fbvFormSection label="plugins.generic.pluginTemplate.publicationStatement"}
+		{fbvFormSection label="plugins.generic.pluginTemplate.captchaType"}
 			{fbvElement
-				type="text"
-				id="publicationStatement"
-				value=$publicationStatement
-				description="plugins.generic.pluginTemplate.publicationStatement.description"
+				type="select"
+				id="captchaType"
+				from=$captchaTypes
+				selected=$captchaType
+				description="plugins.generic.pluginTemplate.captchaType.description"
 			}
 		{/fbvFormSection}
 	{/fbvFormArea}

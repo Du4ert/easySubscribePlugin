@@ -28,7 +28,7 @@ class EasySubscribeSettingsForm extends Form {
 	public function initData() {
 		$context = Application::get()->getRequest()->getContext();
 		$contextId = $context ? $context->getId() : CONTEXT_SITE;
-		$this->setData('publicationStatement', $this->plugin->getSetting($contextId, 'publicationStatement'));
+		$this->setData('captchaType', $this->plugin->getSetting($contextId, 'captchaType'));
 		parent::initData();
 	}
 
@@ -36,7 +36,7 @@ class EasySubscribeSettingsForm extends Form {
 	 * Load data that was submitted with the form
 	 */
 	public function readInputData() {
-		$this->readUserVars(['publicationStatement']);
+		$this->readUserVars(['captchaType']);
 		parent::readInputData();
 	}
 
@@ -55,6 +55,7 @@ class EasySubscribeSettingsForm extends Form {
 		// used in the URL that the form is submitted to
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign('pluginName', $this->plugin->getName());
+		$templateMgr->assign('captchaTypes', ['securimage' => 'plugins.generic.easySubscribe.captchaType.securimage', 'gregwar' => 'plugins.generic.easySubscribe.captchaType.gregwar']);
 
 		return parent::fetch($request, $template, $display);
 	}
@@ -67,7 +68,7 @@ class EasySubscribeSettingsForm extends Form {
 	public function execute() {
 		$context = Application::get()->getRequest()->getContext();
 		$contextId = $context ? $context->getId() : CONTEXT_SITE;
-		$this->plugin->updateSetting($contextId, 'publicationStatement', $this->getData('publicationStatement'));
+		$this->plugin->updateSetting($contextId, 'captchaType', $this->getData('captchaType'));
 		$templateMgr = TemplateManager::getManager($request);
         $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
         $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();

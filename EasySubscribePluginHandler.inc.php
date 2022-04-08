@@ -6,11 +6,10 @@ use Securimage;
 import('classes.handler.Handler');
 class EasySubscribePluginHandler extends Handler
 {
-    const CAPTCHA_TYPE = 'gregwar'; // gregwar || securimage
-
     public $contextId;
     public $plugin;
     public $reCaptchaEnabled;
+    public $captchaType;
 
     function __construct($request)
     {
@@ -18,6 +17,7 @@ class EasySubscribePluginHandler extends Handler
         $this->contextId = $request->getContext()->getId();
         $this->plugin = PluginRegistry::getPlugin('generic', 'easysubscribeplugin');
         $this->reCaptchaEnabled = Config::getVar('captcha', 'captcha_on_register') && Config::getVar('captcha', 'recaptcha');
+        $this->captchaType = $this->plugin->getSetting($this->contextId, 'captchaType');
     }
 
     public function index($args, $request)
@@ -29,9 +29,9 @@ class EasySubscribePluginHandler extends Handler
             $captchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
 
             $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
-        } elseif ($this::CAPTCHA_TYPE === 'securimage') {
+        } elseif ($this->captchaType === 'securimage') {
             $captchaHtml = Securimage::getCaptchaHtml();
-        } elseif ($this::CAPTCHA_TYPE === 'gregwar') {
+        } elseif ($this->captchaType === 'gregwar') {
             $builder = new CaptchaBuilder;
             $builder->build($width = 200, $height = 60, $font = null);
             $captchaHtml = '<p><img src="'. $builder->inline() . '"/><p><input type="text" name="captcha_code" required /></p>';
@@ -84,7 +84,7 @@ class EasySubscribePluginHandler extends Handler
                 $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
                 $message[] = __('plugins.generic.easySubscribe.form.captcha');
             }
-        } elseif ($this::CAPTCHA_TYPE === 'securimage') {
+        } elseif ($this->captchaType === 'securimage') {
                 $image = new Securimage();
                 $captchaHtml = Securimage::getCaptchaHtml();
     
@@ -92,7 +92,7 @@ class EasySubscribePluginHandler extends Handler
                     $status = 'error';
                     $message[] = __('plugins.generic.easySubscribe.form.captcha');
                 }
-            } elseif ($this::CAPTCHA_TYPE === 'gregwar') {
+            } elseif ($this->captchaType === 'gregwar') {
                 $builder = new CaptchaBuilder;
                 $builder->build($width = 200, $height = 60, $font = null);
                 $captchaHtml = '<p><img src="'. $builder->inline() . '"/></p><p><input type="text" name="captcha_code" required /></p>';

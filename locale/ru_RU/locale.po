@@ -132,3 +132,9 @@ msgstr "Новое уведомление с сайта"
 
 msgid "plugins.generic.easySubscribe.page.list.title"
 msgstr "Список подписавшихся"
+
+msgid "plugins.generic.easySubscribe.captchaType.securimage"
+msgstr "Securimage"
+
+msgid "plugins.generic.easySubscribe.captchaType.gregwar"
+msgstr "Gregwar"

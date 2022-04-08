@@ -11,6 +11,7 @@
  * @brief Plugin class for the EasySubscribe plugin.
  */
 import('lib.pkp.classes.plugins.GenericPlugin');
+
 class EasySubscribePlugin extends GenericPlugin
 {
 	const GROUP_READERS_ID = 17; //! найти, где определяется id и переприсвоить

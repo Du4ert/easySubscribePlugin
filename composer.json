@@ -1,0 +1,7 @@
+{
+    "name": "user/easy-subscribe",
+    "require": {
+        "gregwar/captcha": "1.*",
+        "dapphp/securimage": "^4.0"
+    }
+}

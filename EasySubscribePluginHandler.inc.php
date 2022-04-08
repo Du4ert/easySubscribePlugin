@@ -1,7 +1,13 @@
 <?php
+require_once(__DIR__ . '/vendor/autoload.php');
+use Gregwar\Captcha\CaptchaBuilder;
+use Securimage;
+
 import('classes.handler.Handler');
 class EasySubscribePluginHandler extends Handler
 {
+    const CAPTCHA_TYPE = 'gregwar'; // gregwar || securimage
+
     public $contextId;
     public $plugin;
     public $reCaptchaEnabled;
@@ -21,20 +27,23 @@ class EasySubscribePluginHandler extends Handler
         if ($this->reCaptchaEnabled) {
             $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
             $captchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';
-            $templateMgr->assign(array(
-                'captchaHtml' => $captchaHtml,
-                'captchaEnabled' => true,
-            ));
-            $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
-        } else {
-            require_once('securimage/securimage.php');
-            $captchaHtml = Securimage::getCaptchaHtml();
 
-            $templateMgr->assign([
-                'captchaHtml' => $captchaHtml,
-                'captchaEnabled' => true
-            ]);
+            $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
+        } elseif ($this::CAPTCHA_TYPE === 'securimage') {
+            $captchaHtml = Securimage::getCaptchaHtml();
+        } elseif ($this::CAPTCHA_TYPE === 'gregwar') {
+            $builder = new CaptchaBuilder;
+            $builder->build($width = 200, $height = 60, $font = null);
+            $captchaHtml = '<p><img src="'. $builder->inline() . '"/><p><input type="text" name="captcha_code" required /></p>';
+
+            $sessionManager = SessionManager::getManager();
+            $session = $sessionManager->getUserSession();
+            $session->setSessionVar('captcha_code',  $builder->getPhrase());
         }
+        $templateMgr->assign(array(
+            'captchaHtml' => $captchaHtml,
+            'captchaEnabled' => true,
+        ));
         return $templateMgr->display($this->plugin->getTemplateResource('subscribe.tpl'));
     }
 
@@ -75,16 +84,29 @@ class EasySubscribePluginHandler extends Handler
                 $templateMgr->addJavaScript('recaptcha', 'https://www.recaptcha.net/recaptcha/api.js?hl=' . substr(AppLocale::getLocale(), 0, 2));
                 $message[] = __('plugins.generic.easySubscribe.form.captcha');
             }
-        } else {
-            require_once('securimage/securimage.php');
-            $image = new Securimage();
-            $captchaHtml = Securimage::getCaptchaHtml();
+        } elseif ($this::CAPTCHA_TYPE === 'securimage') {
+                $image = new Securimage();
+                $captchaHtml = Securimage::getCaptchaHtml();
+    
+                if ($image->check($_POST['captcha_code']) !== true) {
+                    $status = 'error';
+                    $message[] = __('plugins.generic.easySubscribe.form.captcha');
+                }
+            } elseif ($this::CAPTCHA_TYPE === 'gregwar') {
+                $builder = new CaptchaBuilder;
+                $builder->build($width = 200, $height = 60, $font = null);
+                $captchaHtml = '<p><img src="'. $builder->inline() . '"/></p><p><input type="text" name="captcha_code" required /></p>';
+    
+                $sessionManager = SessionManager::getManager();
+                $session = $sessionManager->getUserSession();
+                $code = $session->getSessionVar('captcha_code');
 
-            if ($image->check($_POST['captcha_code']) !== true) {
-                $status = 'error';
-                $message[] = __('plugins.generic.easySubscribe.form.captcha');
+                if (strtolower($_POST['captcha_code']) !== strtolower($code)) {
+                    $status = 'error';
+                    $message[] = __('plugins.generic.easySubscribe.form.captcha');
+                    $session->setSessionVar('captcha_code',  $builder->getPhrase());
+                }
             }
-        }
 
         $templateMgr->assign([
             'captchaHtml' => $captchaHtml,

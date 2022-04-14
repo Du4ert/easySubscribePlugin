@@ -23,7 +23,7 @@ class EasySubscribePluginHandler extends Handler
     public function index($args, $request)
     {
         $templateMgr = TemplateManager::getManager($request);
-
+        $captchaHtml = '';
         if ($this->reCaptchaEnabled) {
             $publicKey = Config::getVar('captcha', 'recaptcha_public_key');
             $captchaHtml = '<div class="g-recaptcha" data-sitekey="' . $publicKey . '"></div>';

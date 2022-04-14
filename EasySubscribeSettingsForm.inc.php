@@ -65,17 +65,14 @@ class EasySubscribeSettingsForm extends Form {
 	 *
 	 * @return null|mixed
 	 */
-	public function execute() {
-		$context = Application::get()->getRequest()->getContext();
-		$contextId = $context ? $context->getId() : CONTEXT_SITE;
+	public function execute(...$functionArgs) {
+		$request = Application::get()->getRequest();
+		$context = $request->getContext();
+		$contextId = $context ? $context->getId() : 0;
 		$this->plugin->updateSetting($contextId, 'captchaType', $this->getData('captchaType'));
-		$templateMgr = TemplateManager::getManager($request);
-        $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
-        $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
-
-
-
-
+		// $templateMgr = TemplateManager::getManager($request);
+        // $easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
+        // $emailsList = $easyEmailDao->getByContextId($this->contextId)->toArray();
 
 		// Tell the user that the save was successful.
 		import('classes.notification.NotificationManager');
@@ -86,6 +83,6 @@ class EasySubscribeSettingsForm extends Form {
 			['contents' => __('common.changesSaved')]
 		);
 
-		return parent::execute();
+		return parent::execute(...$functionArgs);
 	}
 }

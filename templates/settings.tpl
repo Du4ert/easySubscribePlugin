@@ -15,18 +15,18 @@
 
 <form
 	class="pkp_form"
-	id="pluginTemplateSettings"
+	id="pluginTemplateSettingsForm"
 	method="POST"
-	action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}"
->
+	action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
 	<!-- Always add the csrf token to secure your form -->
 	{csrf}
 
-	{fbvFormArea}
+	{fbvFormArea id="easySubscribePluginSettings"}
 		{fbvFormSection label="plugins.generic.pluginTemplate.captchaType"}
 			{fbvElement
 				type="select"
 				id="captchaType"
+				default=$captchaTypes[0]
 				from=$captchaTypes
 				selected=$captchaType
 				description="plugins.generic.pluginTemplate.captchaType.description"

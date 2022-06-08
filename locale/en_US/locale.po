@@ -27,7 +27,7 @@ msgid "plugins.generic.easySubscribe.page.subscribe.title"
 msgstr "Subscribe to email send"
 
 msgid "plugins.generic.easySubscribe.page.description"
-msgstr "Enter your email address to receive immediate notifications of important new content added to the journal."
+msgstr "Enter your email address to receive immediate notifications of important new content added to the journal:"
 
 msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
 msgstr "Unsubscribe"
@@ -48,7 +48,7 @@ msgid "plugins.generic.easySubscribe.page.email.confirm.placeholder"
 msgstr "Confirm your email"
 
 msgid "plugins.generic.easySubscribe.page.locale"
-msgstr "Select the language in which you want to receive notifications"
+msgstr "Select the language in which you want to receive notifications:"
 
 
 msgid "plugins.generic.easySubscribe.form.error.exists"

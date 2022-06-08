@@ -18,13 +18,13 @@ msgid "plugins.generic.easySubscribe.description"
 msgstr "Подписка на объявления, рассылку уведомлений читателям и публикацию выпусков."
 
 msgid "plugins.generic.easySubscribe.page.subscribe"
-msgstr "Уведомления"
+msgstr "Подписка на уведомления"
 
 msgid "plugins.generic.easySubscribe.page.subscribe.title"
-msgstr "Подписаться на рассылку"
+msgstr "Подписка на уведомления"
 
 msgid "plugins.generic.easySubscribe.page.description"
-msgstr "Введите свой электронный адрес, чтобы получать уведомления о новостях журнала."
+msgstr "Введите свой электронный адрес, чтобы получать уведомления о новостях журнала:"
 
 msgid "plugins.generic.easySubscribe.page.unsubscribe.title"
 msgstr "Отписаться"
@@ -33,10 +33,10 @@ msgid "plugins.generic.easySubscribe.breadcrumbs"
 msgstr "Подписка"
 
 msgid "plugins.generic.easySubscribe.page.email"
-msgstr "Адрес (E-mail)"
+msgstr "Адрес (e-mail)"
 
 msgid "plugins.generic.easySubscribe.page.email.confirm"
-msgstr "Подтвердите адрес E-mail"
+msgstr "Подтвердите адрес (e-mail)"
 
 msgid "plugins.generic.easySubscribe.page.email.placeholder"
 msgstr "Введите e-mail"
@@ -45,7 +45,7 @@ msgid "plugins.generic.easySubscribe.page.email.confirm.placeholder"
 msgstr "Подтвердите e-mail"
 
 msgid "plugins.generic.easySubscribe.page.locale"
-msgstr "Выберите язык, на котором хотите получать уведомления"
+msgstr "Выберите язык, на котором хотите получать уведомления:"
 
 msgid "plugins.generic.easySubscribe.form.error.exists"
 msgstr "Этот e-mail адрес уже используется для получения уведомлений"

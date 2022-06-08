@@ -194,8 +194,8 @@ class EasySubscribePlugin extends GenericPlugin
 		$locale = $email->getLocale();
 		$siteName = $context->getName($locale);
         $basePath = $request->getBaseUrl();
-		$fromEmail = $context->getData('contactEmail');
-		$fromName = $context->getData('contactName', $locale);
+		$fromEmail = $context->getData('supportEmail');
+		$fromName = $context->getData('supportName', $locale);
 		$unsubscribeUrl = $basePath . '/' . $context->getPath() . '/easysubscribe/unsubscribe' . '?email=' . $email->getEmail() . '&id=' . $email->getId();
 
 		$subject = $this->easyTranslate('plugins.generic.easySubscribe.letter.subject', $locale) . " " . $context->getName($locale);

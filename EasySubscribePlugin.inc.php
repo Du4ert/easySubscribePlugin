@@ -185,7 +185,7 @@ class EasySubscribePlugin extends GenericPlugin
 		}
 	}
 
-	
+
 	public function sendToSubscriber($body, $email, $request)
 	{
 		$context = $request->getContext();
@@ -194,18 +194,18 @@ class EasySubscribePlugin extends GenericPlugin
 		$locale = $email->getLocale();
 		$siteName = $context->getName($locale);
         $basePath = $request->getBaseUrl();
-		$fromEmail = $context->getData('contactEmail');
-		$fromName = $context->getData('contactName', $locale);
+		$fromEmail = $context->getData('supportEmail');
+		$fromName = $context->getData('supportName', $locale);
 		$unsubscribeUrl = $basePath . '/' . $context->getPath() . '/easysubscribe/unsubscribe' . '?email=' . $email->getEmail() . '&id=' . $email->getId();
 
 		$subject = $this->easyTranslate('plugins.generic.easySubscribe.letter.subject', $locale) . " " . $context->getName($locale);
 
-		
+
 		$header = "<small>" ;
 		$header .= $this->easyTranslate('plugins.generic.easySubscribe.letter.header', $locale) . " ";
 		$header .= $siteName;
 		$header .= "</small>";
-		
+
 		$footer = "<small>";
 		$footer .= $this->easyTranslate('plugins.generic.easySubscribe.letter.unsubscribe.text', $locale);
 		$footer .= " <a href=\"$unsubscribeUrl\">";
@@ -247,7 +247,7 @@ class EasySubscribePlugin extends GenericPlugin
 			$title = $announcement->getTitle($locale);
 			$descriptionShort = $announcement->getDescriptionShort($locale);
 			$url = $request->getBaseUrl() . '/' . $context->getPath() . '/announcement/view/' . $announcement->getData('id');
-	
+
 			$body  = "<p>";
 			$body .= $this->easyTranslate('plugins.generic.easySubscribe.letter.announcement.title', $locale) . ' ';
 			$body .= $title;
@@ -284,10 +284,10 @@ class EasySubscribePlugin extends GenericPlugin
 
 			foreach ($emailsList as $email) {
 				$locale = $email->getLocale();
-	
+
 				$this->sendToSubscriber($body, $email, $request);
 			}
-	
+
 			return true;
 		}
 
@@ -306,7 +306,7 @@ class EasySubscribePlugin extends GenericPlugin
 			if (in_array($issueUrl, EasySubscribePlugin::ISSUE_IGNORE_LIST)) {
 				return false;
 			}
-			
+
 			$easyEmailDao = DAORegistry::getDAO('EasyEmailDAO');
 			$emailsList = $easyEmailDao->getActiveByContextId($context->getId())->toArray();
 
@@ -316,7 +316,7 @@ class EasySubscribePlugin extends GenericPlugin
 				$siteName = $context->getName($locale);
 				$issueTitle = $issue->getIssueIdentification([], $locale);
 				$url = $request->getBaseUrl() . '/' . $context->getPath() . '/issue/view/' . $issue->getData('id');
-		
+
 				$body = "<p>";
 				$body .= $this->easyTranslate('plugins.generic.easySubscribe.letter.issue.title', $locale) . " ";
 				$body .= $issueTitle;
@@ -324,7 +324,7 @@ class EasySubscribePlugin extends GenericPlugin
 				$body .= $this->easyTranslate('plugins.generic.easySubscribe.letter.issue.link', $locale);
 				$body .= " <a href='$url'>$url</a>";
 				$body .= "</p>";
-	
+
 				$this->sendToSubscriber($body, $email, $request);
 			}
 

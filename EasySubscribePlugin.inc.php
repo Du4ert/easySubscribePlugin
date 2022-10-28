@@ -133,11 +133,31 @@ class EasySubscribePlugin extends GenericPlugin
 			__('manager.plugins.settings'),
 			null
 		);
+		$linkAction2 = new LinkAction(
+			'list',
+			new AjaxModal(
+				$router->url(
+					$request,
+					null,
+					null,
+					'manage',
+					null,
+					[
+						'verb' => 'list',
+						'plugin' => $this->getName(),
+						'category' => 'generic'
+					]
+				),
+				$this->getDisplayName()
+			),
+			'list',
+			null
+		);
 
 		// Add the LinkAction to the existing actions.
 		// Make it the first action to be consistent with
 		// other plugins.
-		array_unshift($actions, $linkAction);
+		array_unshift($actions, $linkAction, $linkAction2);
 
 		return $actions;
 	}
@@ -171,6 +191,17 @@ class EasySubscribePlugin extends GenericPlugin
 				if ($form->validate()) {
 					$form->execute();
 					return new JSONMessage(true);
+				}
+			case 'list':
+				// Load the custom form
+				$this->import('EasySubscribeListForm');
+				$form = new EasySubscribeListForm($this);
+
+				// Fetch the form the first time it loads, before
+				// the user has tried to save it
+				if (!$request->getUserVar('save')) {
+					$form->initData();
+					return new JSONMessage(true, $form->fetch($request));
 				}
 		}
 		return parent::manage($args, $request);
@@ -265,6 +296,9 @@ class EasySubscribePlugin extends GenericPlugin
 	public function bulkNotificationCallback($hookName, $params)
 	{
 		$handler = $params[1];
+		if (empty($_POST)) {
+			return false;
+		}
 		$groupIds = $_POST['userGroupIds'];
 		$targetGroupId = EasySubscribePlugin::GROUP_READERS_ID;
 
